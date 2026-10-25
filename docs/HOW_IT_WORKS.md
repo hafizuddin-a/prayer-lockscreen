@@ -26,7 +26,7 @@ Developer notes for Prayer Live Wallpaper: where each part of the code lives and
 | The wallpaper: drawing and redraw triggers | `wallpaper/PrayerWallpaperService.kt`, `wallpaper/WallpaperRenderer.kt` |
 | Settings, photo copy, colour capture | `settings/` |
 | The app UI (Compose) | `ui/` |
-| The hosted privacy policy page (GitHub Pages, its own git repository) | `site/` (`index.html`, `README.md`, `assets/logo.png`); the URL is `Legal.PRIVACY_POLICY_URL` |
+| The hosted privacy policy page (GitHub Pages) | `site/` (`index.html`, `assets/logo.png`), published by `.github/workflows/pages.yml`; the URL is `Legal.PRIVACY_POLICY_URL` |
 
 Things worth knowing:
 

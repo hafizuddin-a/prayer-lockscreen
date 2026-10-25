@@ -3,13 +3,14 @@
 The plan, in order, with the answers Google asks for. The listing text is in [listing.md](listing.md) and the graphics are in `graphics/`.
 Package: `com.prayerwallpaper.app` (permanent once the first bundle is uploaded). Name: **Prayer Live Wallpaper**.
 
-## Where things stand (13 October 2026)
+## Where things stand (25 October 2026)
 
 | Item | State |
 |---|---|
 | Developer account | **Waiting for Google's identity verification** |
-| Upload key | **Not created yet** (step 2). The bundle script refuses to build without it |
-| Privacy policy | **Hosted**: https://hafizuddin-a.github.io/prayer-lockscreen/ (repository https://github.com/hafizuddin-a/prayer-lockscreen, source in `site/`). The app's About screen links to it |
+| Upload key | **Created** (25 October 2026): `~/prayer-wallpaper-upload.jks`, with its password in `keystore.properties` (git-ignored). **Back both up.** The same key signs the GitHub release APK |
+| Privacy policy | **Hosted**: https://hafizuddin-a.github.io/prayer-lockscreen/ (source in `site/`, published by a GitHub Actions workflow). The app's About screen links to it |
+| Source code | **Public and open source (MIT)**: https://github.com/hafizuddin-a/prayer-lockscreen, with the APK in the GitHub release |
 | MUIS and the Hijri dates | **Confirmed**: the developer has MUIS's go-ahead to use the Hijri dates. The About screen keeps the credit |
 | Exact alarm declaration | **Open**: text below, and a fallback build if Google says no |
 | Developer contact email | **Open**: yours to give; the policy and listing currently point to Instagram (@madebyhafiz) |
@@ -27,7 +28,8 @@ it does, plan for it now, because it is the slowest step. Add testers by email i
 ## 2. Create the upload key and sign (once)
 
 Play App Signing is the default: you sign the bundle with an **upload key** only you hold, and Google re-signs it with the app signing key. Keep the
-key file and its passwords somewhere safe and backed up; losing the upload key means asking Google to reset it.
+key file and its passwords somewhere safe and backed up; losing the upload key means asking Google to reset it. The key already exists (see the
+table above); these are the commands that made it, for the record or to make another:
 
 ```bash
 keytool -genkeypair -v -keystore ~/prayer-wallpaper-upload.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000
@@ -44,14 +46,8 @@ For each upload `versionCode` in `app/build.gradle.kts` must be higher than the 
 
 ## 4. Privacy policy
 
-Already hosted (see the table). Put the same address in the Console's privacy policy field. To change the policy: edit `site/index.html`, then
-commit and push from inside `site/` (it is its own repository):
-
-```bash
-cd site && git add -A && git commit -m "Update the privacy policy" && git push
-```
-
-GitHub Pages republishes in about a minute. Change the "Last updated" date in the page when the text changes. The app's in-app privacy summary is
+Already hosted (see the table). Put the same address in the Console's privacy policy field. To change the policy: edit `site/index.html`, commit and
+push to `main`; the workflow in `.github/workflows/pages.yml` republishes it in about a minute. Change the "Last updated" date in the page when the text changes. The app's in-app privacy summary is
 `Legal.PRIVACY_SUMMARY`; keep it in step with the page.
 
 ## 5. Create the app in the Console
@@ -112,8 +108,8 @@ app itself.
 ### Exact alarms
 
 The manifest declares `SCHEDULE_EXACT_ALARM` for reminders at the exact minute. It is **not** `USE_EXACT_ALARM`, which is granted automatically and
-which Play keeps for alarm clock and calendar apps: this one the user grants in Android settings. Play restricts it and asks for a declaration. I
-did not re-check the wording of Play's current form, so answer the questions it actually shows and use this as the content, after checking every
+which Play keeps for alarm clock and calendar apps: this one the user grants in Android settings. Play restricts it and asks for a declaration. The
+wording of Play's current form has not been re-checked, so answer the questions it actually shows and use this as the content, after checking every
 sentence is still true:
 
 > Prayer Live Wallpaper has an optional prayer reminders feature. It sends a notification at each prayer time and, if chosen, a heads-up a set number of
@@ -146,8 +142,8 @@ approximately (Android may deliver them up to an hour late). The Reminders scree
 
 ## 8. Test, then release
 
-1. Upload the signed bundle to **Internal testing**, install it from Play on your phone (remove the sideloaded copy first: it is signed with the debug
-   key), and try every screen, the setup from a fresh install, a reminder (**Reminder health**, send a test reminder), and the widgets. Everything so
+1. Upload the signed bundle to **Internal testing**, install it from Play on your phone (remove any sideloaded copy first: Google re-signs the app with its own
+   key, which differs from the one on the GitHub APK and on a debug build), and try every screen, the setup from a fresh install, a reminder (**Reminder health**, send a test reminder), and the widgets. Everything so
    far was checked on an emulator only.
 2. Read the Pre-launch report in the Console for crashes on other devices, and any "Notification permission" warning.
 3. Closed testing (if required, step 1), then Production, with a staged rollout if you like.

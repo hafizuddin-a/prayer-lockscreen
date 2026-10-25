@@ -5,7 +5,9 @@ Building, debugging and yearly upkeep. How the code is organised is in [HOW_IT_W
 
 ## Build
 
-You need Android Studio (its bundled JDK is used) and the Android SDK. There is no system Java on this Mac.
+You need a JDK (17 or later; Android Studio's bundled one works) and the Android SDK with platform 37 and build-tools 36.0.0, which Android Studio
+installs. `local.properties` with `sdk.dir` is created by Android Studio or by hand. The scripts in `tools/` use `JAVA_HOME` if it is set and
+otherwise Android Studio's JDK on macOS.
 
 ```bash
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
@@ -26,17 +28,30 @@ manifest (for the APK and the bundle), the setup's Exact alarms page is left out
 approximate alarms. It exists in case Google Play does not accept the declaration for that permission:
 `./gradlew :app:bundleRelease -PexactAlarms=false`.
 
-### A sideload APK
+### An APK for your own phone
 
 ```bash
 tools/build-sideload.sh      # runs the tests and lint, builds the release APK, signs it with the Android debug key
 ~/Library/Android/sdk/platform-tools/adb install -r build-out/prayer-wallpaper-1.8.0-sideload.apk
 ```
 
-The APK is signed with the debug key, so a later install from Google Play needs it removed first (the signing keys differ). `install -r` keeps the
-settings and the wallpaper. Use `adb -s <serial>` when an emulator and a phone are both connected.
+This needs no key of yours. A phone can only update an app with a copy signed by the same key, so moving between this APK, the GitHub release APK
+and a Google Play install means uninstalling first. `install -r` over a copy with the same key keeps the settings and the wallpaper. Use
+`adb -s <serial>` when an emulator and a phone are both connected.
 
-For Google Play, sign with your own upload key instead: `tools/build-play-bundle.sh` (see `play/RELEASE_STEPS.md`).
+### Releasing on GitHub
+
+The release APK is signed with a key of the maintainer's, kept outside the repository: `keystore.properties` (git-ignored, see
+`keystore.properties.example`) points at the key file. Back up the key file and its password: phones that installed an APK can only be updated by
+one signed with the same key.
+
+```bash
+tools/build-release-apk.sh   # tests, lint, release APK signed with that key; prints the APK and certificate SHA-256
+gh release create v1.8.0 build-out/prayer-wallpaper-1.8.0.apk --title "Prayer Live Wallpaper 1.8.0" --notes-file notes.md
+```
+
+Put both checksums in the release notes. For Google Play, `tools/build-play-bundle.sh` builds the signed bundle with the same key as the
+upload key (see `play/RELEASE_STEPS.md`).
 
 ## Debug tools
 
@@ -116,7 +131,7 @@ emulator screenshots with the status and navigation bars cropped by the script.
 
 The Hijri date line comes from `data/hijri_months.csv`, the month start dates of Singapore's own MUIS calendar. MUIS decides each month's
 start by imkan ar-rukyah, so the app never calculates or estimates a Hijri date: where the table does not give a certain answer it shows no
-line. MUIS has said the dates may be used in the app (confirmed by the developer on 13 October 2026); the About screen credits the Muis
+line. MUIS has confirmed the dates may be used in the app; the About screen credits the Muis
 Calendar and keeps the "not affiliated with or endorsed by MUIS" line.
 
 The table runs from 1 Syaaban 1447 (20 Jan 2026) to 1 Syaaban 1449 (30 Dec 2027) and gives certain dates through **27 January 2028** (day 29
