@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- The same crescent as the colour icon, as one shape, for themed (monochrome) icons. -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M51.13,28.16 A26,26 0 1,0 78.57,62.48 A22,22 0 1,1 51.13,28.16 Z" />
+</vector>

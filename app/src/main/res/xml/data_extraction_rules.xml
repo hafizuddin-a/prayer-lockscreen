@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Nothing is backed up to the cloud: the chosen photo and colours stay on the device, as the privacy
+    policy says. Device-to-device transfer, which the user starts themselves when moving to a new
+    phone, keeps its default behaviour.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+</data-extraction-rules>

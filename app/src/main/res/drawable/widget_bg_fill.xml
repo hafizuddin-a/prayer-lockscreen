@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The widgets' background. White and opaque here: the code tints it, so the fill's colour and opacity (the glass opacity) are set at run time. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#FFFFFFFF" />
+    <corners android:radius="@android:dimen/system_app_widget_background_radius" />
+</shape>

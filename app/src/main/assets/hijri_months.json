@@ -1,0 +1,155 @@
+{
+ "source": "Muis Calendar published by MUIS (Key Islamic dates)",
+ "months": [
+  {
+   "year": 1447,
+   "month": 8,
+   "name": "Syaaban",
+   "start": "2026-01-20"
+  },
+  {
+   "year": 1447,
+   "month": 9,
+   "name": "Ramadhan",
+   "start": "2026-02-19"
+  },
+  {
+   "year": 1447,
+   "month": 10,
+   "name": "Syawal",
+   "start": "2026-03-21"
+  },
+  {
+   "year": 1447,
+   "month": 11,
+   "name": "Zulkaedah",
+   "start": "2026-04-19"
+  },
+  {
+   "year": 1447,
+   "month": 12,
+   "name": "Zulhijjah",
+   "start": "2026-05-18"
+  },
+  {
+   "year": 1448,
+   "month": 1,
+   "name": "Muharram",
+   "start": "2026-06-17"
+  },
+  {
+   "year": 1448,
+   "month": 2,
+   "name": "Safar",
+   "start": "2026-07-16"
+  },
+  {
+   "year": 1448,
+   "month": 3,
+   "name": "Rabiulawal",
+   "start": "2026-08-14"
+  },
+  {
+   "year": 1448,
+   "month": 4,
+   "name": "Rabiulakhir",
+   "start": "2026-09-13"
+  },
+  {
+   "year": 1448,
+   "month": 5,
+   "name": "Jamadilawal",
+   "start": "2026-10-12"
+  },
+  {
+   "year": 1448,
+   "month": 6,
+   "name": "Jamadilakhir",
+   "start": "2026-11-11"
+  },
+  {
+   "year": 1448,
+   "month": 7,
+   "name": "Rejab",
+   "start": "2026-12-11"
+  },
+  {
+   "year": 1448,
+   "month": 8,
+   "name": "Syaaban",
+   "start": "2027-01-10"
+  },
+  {
+   "year": 1448,
+   "month": 9,
+   "name": "Ramadhan",
+   "start": "2027-02-08"
+  },
+  {
+   "year": 1448,
+   "month": 10,
+   "name": "Syawal",
+   "start": "2027-03-10"
+  },
+  {
+   "year": 1448,
+   "month": 11,
+   "name": "Zulkaedah",
+   "start": "2027-04-09"
+  },
+  {
+   "year": 1448,
+   "month": 12,
+   "name": "Zulhijjah",
+   "start": "2027-05-08"
+  },
+  {
+   "year": 1449,
+   "month": 1,
+   "name": "Muharram",
+   "start": "2027-06-06"
+  },
+  {
+   "year": 1449,
+   "month": 2,
+   "name": "Safar",
+   "start": "2027-07-06"
+  },
+  {
+   "year": 1449,
+   "month": 3,
+   "name": "Rabiulawal",
+   "start": "2027-08-04"
+  },
+  {
+   "year": 1449,
+   "month": 4,
+   "name": "Rabiulakhir",
+   "start": "2027-09-02"
+  },
+  {
+   "year": 1449,
+   "month": 5,
+   "name": "Jamadilawal",
+   "start": "2027-10-02"
+  },
+  {
+   "year": 1449,
+   "month": 6,
+   "name": "Jamadilakhir",
+   "start": "2027-10-31"
+  },
+  {
+   "year": 1449,
+   "month": 7,
+   "name": "Rejab",
+   "start": "2027-11-30"
+  },
+  {
+   "year": 1449,
+   "month": 8,
+   "name": "Syaaban",
+   "start": "2027-12-30"
+  }
+ ]
+}

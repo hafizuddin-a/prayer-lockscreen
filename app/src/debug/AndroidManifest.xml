@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Debug builds only: the fake-clock screen is not part of the release manifest. -->
+    <application>
+        <activity
+            android:name=".DebugClockActivity"
+            android:exported="true"
+            android:label="Fake clock"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Debug builds only: prints the accessibility tree as a screen reader reads it (see DebugA11yDump). -->
+        <service
+            android:name=".DebugA11yDump"
+            android:exported="true"
+            android:label="Debug accessibility dump"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/debug_a11y_dump" />
+        </service>
+    </application>
+</manifest>

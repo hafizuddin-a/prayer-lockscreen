@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Prayer Live Wallpaper</string>
+    <string name="wallpaper_description">Prayer times on your lock screen</string>
+    <string name="msg_load_times">Open the app to load prayer times</string>
+    <string name="msg_update_times">Open the app to update prayer times</string>
+    <string name="msg_cannot_calculate">Can\'t calculate times here today</string>
+    <string name="reminder_channel_name">Prayer reminders</string>
+    <string name="reminder_channel_description">A notification at each prayer time you choose, with your notification sound.</string>
+    <string name="reminder_channel_silent_name">Prayer reminders (vibrate only)</string>
+    <string name="reminder_channel_silent_description">The same reminders with vibration and no sound.</string>
+    <string name="widget_next_label">Next prayer</string>
+    <string name="widget_next_description">The next prayer and its time, with a countdown.</string>
+    <string name="widget_today_label">Today\'s times</string>
+    <string name="widget_today_description">All six times today, the current one marked, with the Hijri date and a countdown.</string>
+    <string name="widget_strip_label">All six in a row</string>
+    <string name="widget_strip_description">The day in one compact strip, the current time marked.</string>
+</resources>

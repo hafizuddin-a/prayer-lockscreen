@@ -1,0 +1,50 @@
+{
+ "source": "Muis Calendar published by MUIS (Key Islamic dates)",
+ "events": [
+  {
+   "month": 1,
+   "day": 1,
+   "name": "Islamic New Year"
+  },
+  {
+   "month": 1,
+   "day": 10,
+   "name": "Asyura Day"
+  },
+  {
+   "month": 3,
+   "day": 12,
+   "name": "Prophet Muhammad’s Birthday"
+  },
+  {
+   "month": 7,
+   "day": 27,
+   "name": "Israk Mikraj"
+  },
+  {
+   "month": 8,
+   "day": 15,
+   "name": "Nisfu Syaaban"
+  },
+  {
+   "month": 9,
+   "day": 1,
+   "name": "Beginning of Fasting"
+  },
+  {
+   "month": 9,
+   "day": 17,
+   "name": "Nuzul Quran"
+  },
+  {
+   "month": 10,
+   "day": 1,
+   "name": "Hari Raya Aidilfitri"
+  },
+  {
+   "month": 12,
+   "day": 10,
+   "name": "Hari Raya Aidiladha"
+  }
+ ]
+}

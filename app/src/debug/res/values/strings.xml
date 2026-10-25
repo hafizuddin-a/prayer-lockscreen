@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="debug_a11y_description">Debug builds only. Prints what a screen reader would announce for the screen in front, to logcat (tag A11yDump) when asked.</string>
+</resources>

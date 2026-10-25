@@ -1,0 +1,5 @@
+<resources>
+    <color name="ic_launcher_background">#000000</color>
+    <!-- The app's page colour (Mono.BACKGROUND in ui/theme/Brand.kt), used as the window background. -->
+    <color name="app_background">#000000</color>
+</resources>

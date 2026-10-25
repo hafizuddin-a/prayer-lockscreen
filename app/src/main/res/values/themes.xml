@@ -1,0 +1,13 @@
+<resources>
+    <!-- Always black and white: the app has one look. The window background matches the first Compose frame, so nothing flashes white. -->
+    <style name="Theme.PrayerWallpaper" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/app_background</item>
+        <item name="android:colorBackground">@color/app_background</item>
+        <!-- The launcher icon's own black, so the crescent in the splash sits on one flat colour. -->
+        <item name="android:windowSplashScreenBackground">@color/ic_launcher_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+    </style>
+</resources>
