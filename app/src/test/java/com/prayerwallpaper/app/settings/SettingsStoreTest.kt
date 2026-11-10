@@ -23,6 +23,15 @@ class SettingsStoreTest {
         assertEquals(List(6) { 0 }, s.adjustments)
     }
 
+    @Test fun `automatic updates are on for a fresh install and the choice survives a write and a read`() {
+        val prefs = FakePrefs()
+        assertTrue(SettingsStore(prefs).read().autoUpdate)
+        SettingsStore(prefs).update { it.copy(autoUpdate = false) }
+        assertFalse(SettingsStore(prefs).read().autoUpdate)
+        SettingsStore(prefs).update { it.copy(autoUpdate = true) }
+        assertTrue(SettingsStore(prefs).read().autoUpdate)
+    }
+
     @Test fun `the place and every choice survive a write and a read`() {
         val prefs = FakePrefs()
         val store = SettingsStore(prefs)

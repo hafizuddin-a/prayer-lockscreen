@@ -92,6 +92,9 @@ fun HomeScreen(app: PrayerApp, resumes: Int, open: (AppScreen) -> Unit, onSetUp:
     }
 
     ScreenScaffold("Prayer Live Wallpaper", onBack = null) {
+        // A new version, when there is one, comes first: it is the one thing that needs a tap.
+        UpdateBanner(app)
+
         // Singapore's times are downloaded once; without them (first run with no internet) the list would only say "open the app".
         // (The status is blank until a download was tried, so this never flashes up before the first attempt.)
         if (settings.place.usesMuis && refresh.data.years.isEmpty() && !refresh.busy && refresh.status.isNotBlank()) {

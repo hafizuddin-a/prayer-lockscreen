@@ -23,6 +23,13 @@
     <!-- Asked for only when the user turns reminders on, and used for nothing else. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!--
+        Lets the app install its own new version, downloaded from its GitHub releases, when the person taps Update (or leaves automatic updates
+        on). Android also makes the person switch on "Allow from this source" for the app. A Google Play build is made with
+        -PselfUpdate=false, which removes this permission from the merged manifest.
+    -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
     <!-- The alarm chain is set again after a reboot. WorkManager merges this in too; declared here because reminders depend on it. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
@@ -64,6 +71,11 @@
         <!-- Delivers a reminder alarm. Not exported: only this app's own pending intents reach it. -->
         <receiver
             android:name=".reminders.ReminderReceiver"
+            android:exported="false" />
+
+        <!-- Gets Android's answer about an update the app handed to the installer. Not exported: only that pending intent reaches it. -->
+        <receiver
+            android:name=".update.UpdateInstallReceiver"
             android:exported="false" />
 
         <!-- Sets the reminder alarm again after a reboot, an update, a clock or time zone change, or a change to the exact alarm permission. -->

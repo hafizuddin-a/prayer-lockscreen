@@ -22,6 +22,16 @@ class MainActivity : ComponentActivity() {
         setContent { AppRoot(app, resumes) }
     }
 
+    override fun onStart() {
+        super.onStart()
+        (application as PrayerApp).updates.appVisible = true
+    }
+
+    override fun onStop() {
+        (application as PrayerApp).updates.appVisible = false
+        super.onStop()
+    }
+
     override fun onResume() {
         super.onResume()
         resumes++
@@ -31,5 +41,7 @@ class MainActivity : ComponentActivity() {
             app.widgets.updateAll("app opened")
             app.widgets.publishPreviews()
         }.start()
+        // Looks for a new version if it is time (the build downloaded from GitHub only), and goes on with an update that was waiting for a permission.
+        app.updates.onAppResumed()
     }
 }

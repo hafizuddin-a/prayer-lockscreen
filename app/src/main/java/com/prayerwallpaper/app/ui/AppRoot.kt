@@ -65,7 +65,7 @@ fun AppRoot(app: PrayerApp, resumes: Int) {
                 AppScreen.REMINDER_HEALTH -> ReminderHealthScreen(app, onBack = ::back)
                 AppScreen.WIDGETS -> WidgetsScreen(app, resumes, onBack = ::back, onHealth = { open(AppScreen.WIDGET_HEALTH) })
                 AppScreen.WIDGET_HEALTH -> WidgetHealthScreen(app, onBack = ::back)
-                AppScreen.ABOUT -> AboutScreen(app, onBack = ::back)
+                AppScreen.ABOUT -> AboutScreen(app, resumes, onBack = ::back)
             }
         }
     }

@@ -37,7 +37,9 @@ import com.prayerwallpaper.app.settings.SettingsStore
 import com.prayerwallpaper.app.wallpaper.RedrawSignal
 import com.prayerwallpaper.app.wallpaper.LookProvider
 import com.prayerwallpaper.app.widgets.WidgetUpdater
+import com.prayerwallpaper.app.update.UpdateManager
 import com.prayerwallpaper.app.work.ReminderCheckWorker
+import com.prayerwallpaper.app.work.UpdateWorker
 import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
@@ -115,11 +117,15 @@ class PrayerApp : Application() {
         Thread { reminders.ensureScheduled("place changed") }.start()
     }
 
-    /** Keeps the two daily jobs as the settings need them: the data refresh for Singapore, the reminder check while reminders are on. */
+    /**
+     * Keeps the daily jobs as the settings need them: the data refresh for Singapore, the reminder check while reminders are on, and the
+     * update check while "Keep the app up to date" is on (only in the build downloaded from GitHub).
+     */
     fun syncBackgroundJobs() {
         val current = settings.read()
         RefreshWorker.setEnabled(this, current.place.usesMuis)
         ReminderCheckWorker.setEnabled(this, current.remindersOn)
+        UpdateWorker.setEnabled(this, BuildConfig.SELF_UPDATE && current.autoUpdate)
     }
 
     private var calculated: Pair<CalcRequest, CalculatedTimetable>? = null
@@ -163,6 +169,9 @@ class PrayerApp : Application() {
 
     /** The home screen widgets. Reads the cache and the settings only; never fetches anything. */
     val widgets: WidgetUpdater by lazy { WidgetUpdater(this) }
+
+    /** Updates from GitHub, for the build people download there. */
+    val updates: UpdateManager by lazy { UpdateManager(this) }
 
     val photos: PhotoStore by lazy { PhotoStore(this) }
     val looks: LookProvider by lazy { LookProvider(settings, photos) }

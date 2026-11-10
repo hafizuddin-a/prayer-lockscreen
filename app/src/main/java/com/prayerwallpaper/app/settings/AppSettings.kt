@@ -86,6 +86,8 @@ data class AppSettings(
     val accessAsked: Boolean = false,
     /** Whether the first-run setup was finished. An update never shows it (see [com.prayerwallpaper.app.logic.shouldShowSetup]). */
     val setupDone: Boolean = false,
+    /** Whether the app looks for a new version on GitHub about once a day and installs it when Android allows. Only builds with self-update have it. */
+    val autoUpdate: Boolean = true,
     /** Notifications at prayer times. Off until the user turns them on, which starts the permission flow. */
     val remindersOn: Boolean = false,
     /** The prayers to remind about: all but Syuruk (sunrise is not a prayer) by default. */
@@ -186,6 +188,7 @@ class SettingsStore(private val prefs: SharedPreferences) {
             boldText = prefs.getBoolean(ACCESS_BOLD, d.boldText),
             accessAsked = prefs.getBoolean(ACCESS_ASKED, d.accessAsked),
             setupDone = prefs.getBoolean(SETUP_DONE, d.setupDone),
+            autoUpdate = prefs.getBoolean(AUTO_UPDATE, d.autoUpdate),
             remindersOn = prefs.getBoolean(REMINDERS_ON, d.remindersOn),
             reminderPrayers = readReminderPrayers() ?: d.reminderPrayers,
             preReminderMinutes = prefs.getInt(PRE_REMINDER_MINUTES, d.preReminderMinutes).takeIf { it in PRE_REMINDER_CHOICES } ?: d.preReminderMinutes,
@@ -273,6 +276,7 @@ class SettingsStore(private val prefs: SharedPreferences) {
             putBoolean(ACCESS_BOLD, settings.boldText)
             putBoolean(ACCESS_ASKED, settings.accessAsked)
             putBoolean(SETUP_DONE, settings.setupDone)
+            putBoolean(AUTO_UPDATE, settings.autoUpdate)
             putBoolean(REMINDERS_ON, settings.remindersOn)
             putString(REMINDER_PRAYERS, Prayer.entries.filter { it in settings.reminderPrayers }.joinToString(",") { it.name })
             putInt(PRE_REMINDER_MINUTES, settings.preReminderMinutes.takeIf { it in PRE_REMINDER_CHOICES } ?: 0)
@@ -338,6 +342,7 @@ class SettingsStore(private val prefs: SharedPreferences) {
         const val ACCESS_BOLD = "access_bold"
         const val ACCESS_ASKED = "access_asked"
         const val SETUP_DONE = "setup_done"
+        const val AUTO_UPDATE = "auto_update"
         const val REMINDERS_ON = "reminders_on"
         const val REMINDER_PRAYERS = "reminder_prayers"
         const val PRE_REMINDER_MINUTES = "pre_reminder_minutes"

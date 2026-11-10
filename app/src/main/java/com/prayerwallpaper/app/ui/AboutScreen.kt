@@ -21,14 +21,17 @@ import com.prayerwallpaper.app.logic.SINGAPORE
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AboutScreen(app: PrayerApp, onBack: () -> Unit) {
+fun AboutScreen(app: PrayerApp, resumes: Int, onBack: () -> Unit) {
     val context = LocalContext.current
+    val settings = rememberSettings(app, resumes)
     // When the timetable was last downloaded, which the licence's notice has to state.
     val accessedOn = remember { app.repository.data().years.maxOfOrNull { it.fetchedAt }?.atZone(SINGAPORE)?.toLocalDate() }
     fun open(url: String) = openUrl(context, url)
 
     ScreenScaffold("About", onBack, spacing = 14.dp) {
         Text("Prayer Live Wallpaper, version ${BuildConfig.VERSION_NAME}", style = MaterialTheme.typography.titleSmall)
+
+        UpdatesSection(app, settings)
 
         Text("Feedback", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
         Text("Found a bug, or want a feature? Tell me on Instagram.")

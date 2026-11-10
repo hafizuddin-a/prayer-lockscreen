@@ -23,10 +23,11 @@ Developer notes for Prayer Live Wallpaper: where each part of the code lives and
 | Reminders: the scheduler, the alarm and notification services, the receivers | `reminders/` (`Reminders`, `AlarmGateway`, `ReminderNotifier`, `ReminderReceiver`, `ReminderTriggerReceiver`), `work/ReminderCheckWorker.kt` |
 | Reminder health: the rules, the screen, the share text | `logic/ReminderHealth.kt`, `logic/ReminderShare.kt`, `reminders/AndroidHealth.kt`, `ui/ReminderHealthScreen.kt`, `ui/RemindersUi.kt` |
 | Daily refresh job (Singapore only) | `work/RefreshWorker.kt` |
+| Updating itself from GitHub: which release is newer, which file, the checks, the install (not in a Play build) | `logic/AppUpdate.kt` (pure, tested), `update/` (`UpdateManager`, `UpdateStore`, `UpdateState`, `UpdateNotifier`, `UpdateInstallReceiver`), `work/UpdateWorker.kt`, `ui/UpdateUi.kt` (the home banner and the About section) |
 | The wallpaper: drawing and redraw triggers | `wallpaper/PrayerWallpaperService.kt`, `wallpaper/WallpaperRenderer.kt` |
 | Settings, photo copy, colour capture | `settings/` |
 | The app UI (Compose) | `ui/` |
-| The hosted privacy policy page (GitHub Pages) | `site/` (`index.html`, `assets/logo.png`), published by `.github/workflows/pages.yml`; the URL is `Legal.PRIVACY_POLICY_URL` |
+| The hosted pages (GitHub Pages): the privacy policy and the download page | `site/` (`index.html`, `download/index.html`, `assets/`), published by `.github/workflows/pages.yml`; the policy's URL is `Legal.PRIVACY_POLICY_URL` |
 
 Things worth knowing:
 
@@ -36,6 +37,20 @@ Things worth knowing:
   fresh install (`shouldShowSetup`, decided once at start, because answering page 1 changes what it reads); **Run setup again** is on the home
   screen. The apply page judges the result only once the user is back from Android's screen. The Reminders page runs the same permission flow
   as the Reminders screen (`ReminderFlow`) but leaves the exact alarm pop-up to the next page (`offerExact = false`).
+- **The updater** (only in the build downloaded from GitHub) is `update/UpdateManager`, with its decisions in `logic/AppUpdate.kt`. It asks
+  `releases/latest` of this repository (GitHub leaves out drafts and pre-releases, and the parser skips them too), reads the tag as the version and
+  takes the asset named `prayer-wallpaper.apk` (or the only `.apk`). A download URL is trusted only if it starts with this repository's
+  `releases/download/` (a debug build also accepts `http://10.0.2.2:`, so an update can be tried against a local file). The file goes to
+  `cacheDir/updates` (emptied at the next start), where `problemWith` checks the size, the package name, a higher `versionCode` and that its signer
+  SHA-256 is the running copy's. Android enforces all of that itself; the checks only let the app say what is wrong in plain words. The install is a
+  `PackageInstaller` session with `USER_ACTION_NOT_REQUIRED`: Android skips its own prompt only for the app that installed the running copy, so an
+  update of a copy installed from a downloaded file asks once, and later ones can go in quietly. It needs `REQUEST_INSTALL_PACKAGES` and the
+  person's own **Allow from this source** (`SystemScreens.unknownSources`). When Android wants a tap it hands back an intent: the app starts it if
+  its screen is in front, otherwise posts a notification (only if notifications are already allowed), and the home banner covers the rest. The
+  app asks when it opens (`onAppResumed`, at most every six hours) and through `UpdateWorker` once a day, both only while **Keep the app up to date**
+  is on; **Check for updates** always asks. `-PselfUpdate=false` removes all of it, and the permission, which Google Play needs. Play Protect blocked
+  a debug build as "Harmful app" but showed only its usual "App scan recommended", then "This app looks safe", for the signed release build (Play
+  emulator, 11 November 2026), so test the real APK, not a debug one.
 - **Friday.** `PrayerDay.label(prayer, names)` gives the Friday prayer's name on a Friday (Jumaat or Jumuah in place of
   Zohor or Dhuhr), so it follows the day whose times are on the list, which is the calendar day's: from midnight on Friday it says Jumaat. It
   applies to every place. Only the name changes.

@@ -211,6 +211,12 @@ internal fun WelcomePage(app: PrayerApp, resumes: Int, state: SettingsState, onN
             "Change it later in Easier reading.",
             style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+        if (BuildConfig.SELF_UPDATE) {
+            Text(
+                "The app looks on GitHub once a day for a new version. You can turn that off in About.",
+                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

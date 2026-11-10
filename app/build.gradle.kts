@@ -25,19 +25,30 @@ val debugApiKey = Properties().apply {
 // leaves the permission out of the merged manifest entirely and everything else is the same: reminders then arrive approximately.
 val exactAlarms = (findProperty("exactAlarms") as String?)?.toBooleanStrictOrNull() ?: true
 
-/** Removes the exact alarm permission from the merged manifest, whichever manifest it was merged in from. */
-abstract class RemoveExactAlarmPermissionTask : DefaultTask() {
+// Whether this build can update itself from the app's GitHub releases (the default, for the build people download there), or not.
+// Google Play does not allow an app to update itself any other way than through Play, so a Play build is made with -PselfUpdate=false:
+// the permission to install apps is left out of the merged manifest and the update screens and daily job are off.
+val selfUpdate = (findProperty("selfUpdate") as String?)?.toBooleanStrictOrNull() ?: true
+
+/** Removes permissions from the merged manifest, whichever manifest they were merged in from. */
+abstract class RemovePermissionsTask : DefaultTask() {
     @get:InputFile
     @get:PathSensitive(PathSensitivity.NONE)
     abstract val mergedManifest: RegularFileProperty
+
+    @get:Input
+    abstract val permissions: ListProperty<String>
 
     @get:OutputFile
     abstract val updatedManifest: RegularFileProperty
 
     @TaskAction
     fun run() {
-        val declaration = Regex("""[ \t]*<uses-permission[^>]*android:name="android\.permission\.SCHEDULE_EXACT_ALARM"[^>]*/>[ \t]*\r?\n?""")
-        updatedManifest.get().asFile.writeText(mergedManifest.get().asFile.readText().replace(declaration, ""))
+        var text = mergedManifest.get().asFile.readText()
+        for (name in permissions.get()) {
+            text = text.replace(Regex("""[ \t]*<uses-permission[^>]*android:name="${Regex.escape(name)}"[^>]*/>[ \t]*\r?\n?"""), "")
+        }
+        updatedManifest.get().asFile.writeText(text)
     }
 }
 
@@ -52,9 +63,10 @@ android {
         applicationId = "com.prayerwallpaper.app"
         minSdk = 34
         targetSdk = 36
-        versionCode = 9
-        versionName = "1.8.0"
+        versionCode = 10
+        versionName = "1.8.1"
         buildConfigField("boolean", "EXACT_ALARMS", exactAlarms.toString())
+        buildConfigField("boolean", "SELF_UPDATE", selfUpdate.toString())
     }
 
     signingConfigs {
@@ -94,10 +106,14 @@ android {
 
 androidComponents {
     onVariants { variant ->
-        if (!exactAlarms) {
-            val remove = tasks.register<RemoveExactAlarmPermissionTask>("${variant.name}RemoveExactAlarmPermission")
+        val unwanted = buildList {
+            if (!exactAlarms) add("android.permission.SCHEDULE_EXACT_ALARM")
+            if (!selfUpdate) add("android.permission.REQUEST_INSTALL_PACKAGES")
+        }
+        if (unwanted.isNotEmpty()) {
+            val remove = tasks.register<RemovePermissionsTask>("${variant.name}RemoveUnwantedPermissions") { permissions.set(unwanted) }
             variant.artifacts.use(remove)
-                .wiredWithFiles(RemoveExactAlarmPermissionTask::mergedManifest, RemoveExactAlarmPermissionTask::updatedManifest)
+                .wiredWithFiles(RemovePermissionsTask::mergedManifest, RemovePermissionsTask::updatedManifest)
                 .toTransform(SingleArtifact.MERGED_MANIFEST)
         }
     }

@@ -1,13 +1,84 @@
-# Publishing on Google Play
+# Releasing: GitHub, Google's developer verification, and Google Play
 
-The plan, in order, with the answers Google asks for. The listing text is in [listing.md](listing.md) and the graphics are in `graphics/`.
-Package: `com.prayerwallpaper.app` (permanent once the first bundle is uploaded). Name: **Prayer Live Wallpaper**.
+How the app reaches people and what has to be done for each release. **A** and **B** are how it is distributed now (a download page and the GitHub
+release). From **Google Play: where things stand** down is the Play plan, with the answers Google asks for, kept for if Play is ever used: it needs a
+closed test with enough testers, which is why it is parked. The listing text is in [listing.md](listing.md) and the graphics are in `graphics/`.
+Package: `com.prayerwallpaper.app`. Name: **Prayer Live Wallpaper**.
 
-## Where things stand (25 October 2026)
+## A. Releasing on GitHub (how people get the app)
+
+People get the app from the download page (`site/download/`, at https://hafizuddin-a.github.io/prayer-lockscreen/download/), whose button is
+`https://github.com/hafizuddin-a/prayer-lockscreen/releases/latest/download/prayer-wallpaper.apk`. The installed app asks the same release feed
+(`releases/latest`) about updates. Both rely on two rules, so keep to them:
+
+- every release has **one APK asset named exactly `prayer-wallpaper.apk`** (the file `tools/build-release-apk.sh` writes), and
+- every release is **signed with the same key** (`~/prayer-wallpaper-upload.jks`). Android only installs an update signed like the installed app.
+
+For each release:
+
+1. Raise `versionCode` and `versionName` in `app/build.gradle.kts`. The app offers a release when its tag (`v1.8.2`) is a later version than its own
+   `versionName`, and Android needs the new `versionCode` to be higher.
+2. `tools/build-release-apk.sh`: tests, lint, build, sign, and the checksums.
+3. Worth doing: install that file on your own phone by opening it (not with `adb`) and, if Google Play Protect says **App scan recommended**, tap
+   **Scan app**. Google then has seen the file, which may spare other people that step. (Not something Google documents, so treat it as a courtesy.)
+4. `gh release create v1.8.2 build-out/prayer-wallpaper.apk --title "Prayer Live Wallpaper 1.8.2" --notes-file notes.md`. Notes: what changed in
+   plain words, the APK's SHA-256 and the certificate's SHA-256 (both printed by the script).
+5. Check the fixed link: `curl -sIL https://github.com/hafizuddin-a/prayer-lockscreen/releases/latest/download/prayer-wallpaper.apk | grep -iE '^(HTTP|content-length)'`
+   should end in a 200 and the APK's size. Phones with the app see the release within a day, or at once with **Check for updates** under About.
+
+Do not replace a published release's APK with a different file under the same version (phones that have that version would never be offered the
+fix), and do not publish a pre-release or draft expecting phones to get it: the app ignores both. An update from the first GitHub install of an
+older release asks for a tap and Android's prompt; Android lets an app install without a prompt only when that app installed the running copy, so
+later updates can go in on their own.
+
+The page and the privacy policy are in `site/`: edit, push to `main`, and `.github/workflows/pages.yml` publishes them in about a minute.
+`site/assets/download-qr.svg` is a QR code for the download page's address (made with `swift tools/make-qr.swift`; scan the result with a phone
+before pushing if the address ever changes).
+
+## B. Registering the app with Google (Android developer verification)
+
+**Why.** From 2027 every app on a certified Android phone has to be registered to a verified developer, or the person installing it must go through
+Android's "advanced flow" (turn on developer mode, restart, wait a day, then tap "Install anyway"). Since 30 September 2026 this is enforced in
+Singapore, Brazil, Indonesia and Thailand, but only for installs from Google Play, Galaxy Store, GetApps and the other stores Google lists.
+Installing an APK downloaded from the page is not checked yet, and `adb` installs never are. Registering takes a few steps and keeps the install
+experience as it is now. (Google's overview: https://developer.android.com/developer-verification/guides.)
+
+**What gets registered:** the package `com.prayerwallpaper.app` and the SHA-256 of the key that signs the GitHub APK:
+`7C:0F:AF:E6:5F:40:F8:2F:D0:E3:39:53:81:67:2B:84:3C:81:B2:D4:2F:87:26:8B:4C:26:3B:B7:71:AC:7D:A7`
+(the same in plain hex: `7c0fafe65f40f82fd0e3395381672b843c81b2d42f87268b4c263bb771ac7da7`; `tools/build-release-apk.sh` prints it).
+
+**Where.** With a Play Console account (identity verified), use Play Console; it needs no store listing and no testers for an app that is only
+distributed outside Play. Without one, the Android Developer Console (https://android.google.com/developerconsole) does the same: identity check,
+a one-off US$25 fee for full distribution. Its free "limited distribution" account is for up to 20 devices, so it does not suit a public download.
+
+**Steps** (Play Console Help, "Registering Android package names"):
+
+1. Play Console, **Android developer verification**, **Package names** tab, **Register package name**. Enter `com.prayerwallpaper.app` and a name for
+   yourself (Prayer Live Wallpaper), then **Next**.
+2. **Key.** If Google has never seen the package on Android, choose **Add key** and paste the SHA-256 above. If it has installs, choose **Select
+   key** and pick the fingerprint from the list of eligible ones (or search for it), then **Add key**. A key that is not listed can still be
+   requested: expand the list of other keys and give a short reason (the key signs the app people already have installed).
+3. **Prove you own the key.** Choose **Upload APK**, copy the **snippet** the console shows, create `app/src/main/assets/adi-registration.properties`
+   with the snippet in it, run `tools/build-release-apk.sh`, and upload `build-out/prayer-wallpaper.apk`. Before uploading, check it:
+   `unzip -p build-out/prayer-wallpaper.apk assets/adi-registration.properties` shows the snippet and `apksigner verify --print-certs` shows the
+   key above. The file name must be exactly `adi-registration.properties`, and the APK must be a release build signed with that key.
+4. Wait for Google's email. The package's status on the **Package names** tab goes from In review to **Registered** (a key takes a few minutes to
+   reach Android's registry after it is added).
+5. Keep `adi-registration.properties` in the app: it is an identifier for the developer account, not a secret, and later releases can carry it.
+
+Notes. A package can have more than one key (Add key on its page), which is how a second signing key, such as Google's if the app ever goes on Play,
+is registered alongside this one. **If the key is lost the app cannot be registered or updated**: keep `~/prayer-wallpaper-upload.jks` and its
+password in two places. Check the status in the Console, or with Android Studio Panda 4 or later when it builds a signed APK.
+
+## Google Play: where things stand (25 October 2026)
+
+The Play bundle is built with `tools/build-play-bundle.sh`, which always passes `-PselfUpdate=false`: Google Play does not allow an app to update
+itself, so that build has no `REQUEST_INSTALL_PACKAGES`, no update check and no update screens, and everything in this part is unchanged by the
+updater.
 
 | Item | State |
 |---|---|
-| Developer account | **Waiting for Google's identity verification** |
+| Developer account | **Waiting for Google's identity verification** (as of 25 October: check Settings, Developer account in the Console) |
 | Upload key | **Created** (25 October 2026): `~/prayer-wallpaper-upload.jks`, with its password in `keystore.properties` (git-ignored). **Back both up.** The same key signs the GitHub release APK |
 | Privacy policy | **Hosted**: https://hafizuddin-a.github.io/prayer-lockscreen/ (source in `site/`, published by a GitHub Actions workflow). The app's About screen links to it |
 | Source code | **Public and open source (MIT)**: https://github.com/hafizuddin-a/prayer-lockscreen, with the APK in the GitHub release |
@@ -173,5 +244,7 @@ How the permissions are used: `ACCESS_COARSE_LOCATION` is a runtime permission a
 (approximate, foreground only; no special declaration form, but it is in the Data safety section above and the policy describes it). `ACCESS_NETWORK_STATE`
 comes from WorkManager. `POST_NOTIFICATIONS`, `SCHEDULE_EXACT_ALARM` and `RECEIVE_BOOT_COMPLETED` belong to the optional reminders (and the boot
 receiver also sets the widgets' alarms again). A `-PexactAlarms=false` build leaves `SCHEDULE_EXACT_ALARM` out of the merged manifest entirely.
+The build downloaded from GitHub also declares `REQUEST_INSTALL_PACKAGES`, for its updater; a `-PselfUpdate=false` build (the Play bundle, made by
+`tools/build-play-bundle.sh`) leaves it out the same way (checked in a built APK with `aapt2 dump permissions`, 11 November 2026).
 
 After launch, the yearly jobs (the Hijri table, the new timetable, the city list) are in [../DEVELOPING.md](../DEVELOPING.md).

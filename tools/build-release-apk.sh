@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Builds the APK for a GitHub release: runs the tests and lint, builds the minified release APK signed with the key in keystore.properties,
-# checks the signature and prints the checksums to put in the release notes. Output: build-out/prayer-wallpaper-<version>.apk
+# checks the signature and prints the checksums to put in the release notes. Output: build-out/prayer-wallpaper.apk
+# (the file name is the same for every version on purpose: the app and the download page look for exactly that name in the newest release)
 #   tools/build-release-apk.sh
 # Needs keystore.properties in the project root (see keystore.properties.example and docs/play/RELEASE_STEPS.md, step 2). Keep the key file and
 # its password backed up: phones that install this APK can only be updated by an APK signed with the same key.
@@ -21,8 +22,8 @@ if [ ! -f "$out/app-release.apk" ]; then
 fi
 version=$(grep -E 'versionName' app/build.gradle.kts | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
 mkdir -p build-out
-dest="build-out/prayer-wallpaper-$version.apk"
+dest="build-out/prayer-wallpaper.apk"
 cp "$out/app-release.apk" "$dest"
 "$BT/apksigner" verify --print-certs "$dest" | grep -E "Signer #1 certificate (DN|SHA-256)"
 echo "APK SHA-256: $(shasum -a 256 "$dest" | cut -d' ' -f1)"
-echo "Release APK ready: $dest"
+echo "Release APK ready: $dest (version $version)"

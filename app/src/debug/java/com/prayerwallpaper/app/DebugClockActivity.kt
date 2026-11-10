@@ -104,7 +104,21 @@ class DebugClockActivity : ComponentActivity() {
         applyLook(intent)
         applyReminders(intent)
         applyWidgets(intent)
+        applyUpdates(intent)
         if (intent.getBooleanExtra("finish", false)) finish()
+    }
+
+    /**
+     * Updates from GitHub, tried without publishing anything: --es updatefeed http://10.0.2.2:8000/latest.json (the address to ask instead of GitHub,
+     * a file shaped like GitHub's "latest release" answer; an empty value goes back to GitHub), --ez updatecheck true (a person's own check now),
+     * --ez updatenow true (what the daily job does, now), --ez updatereset true (forget what was found). Read the result: `adb logcat -d -s PrayerUpdate`.
+     */
+    private fun applyUpdates(intent: Intent) {
+        val app = application as PrayerApp
+        if (intent.hasExtra("updatefeed")) app.updates.debugSetFeed(intent.getStringExtra("updatefeed"))
+        if (intent.getBooleanExtra("updatereset", false)) app.updates.debugReset()
+        if (intent.getBooleanExtra("updatecheck", false)) app.updates.checkAsync(force = true)
+        if (intent.getBooleanExtra("updatenow", false)) Thread { app.updates.runInBackground() }.start()
     }
 
     /** Widgets: the settings behind them, and rendering one to a PNG (see [WidgetDebug]). */

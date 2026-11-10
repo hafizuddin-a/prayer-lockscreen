@@ -8,6 +8,8 @@
     <string name="reminder_channel_description">A notification at each prayer time you choose, with your notification sound.</string>
     <string name="reminder_channel_silent_name">Prayer reminders (vibrate only)</string>
     <string name="reminder_channel_silent_description">The same reminders with vibration and no sound.</string>
+    <string name="update_channel_name">App updates</string>
+    <string name="update_channel_description">Tells you when a new version of the app is ready.</string>
     <string name="widget_next_label">Next prayer</string>
     <string name="widget_next_description">The next prayer and its time, with a countdown.</string>
     <string name="widget_today_label">Today\'s times</string>

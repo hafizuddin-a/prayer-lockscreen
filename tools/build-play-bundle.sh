@@ -2,12 +2,14 @@
 # Builds the signed Android App Bundle for Google Play and checks it is really signed.
 #   tools/build-play-bundle.sh                 normal build (exact alarm permission declared)
 #   tools/build-play-bundle.sh --no-exact      fallback: leaves SCHEDULE_EXACT_ALARM out (reminders then arrive approximately)
+# Always builds with -PselfUpdate=false: Google Play does not allow an app to update itself, so the Play build leaves out the permission to
+# install apps and hides the update screens. (The APK people download from GitHub keeps them: tools/build-release-apk.sh.)
 # Needs keystore.properties in the project root (see keystore.properties.example and docs/play/RELEASE_STEPS.md).
 set -eu
 cd "$(dirname "$0")/.."
 export JAVA_HOME="${JAVA_HOME:-/Applications/Android Studio.app/Contents/jbr/Contents/Home}"
-extra=""
-[ "${1:-}" = "--no-exact" ] && extra="-PexactAlarms=false"
+extra="-PselfUpdate=false"
+[ "${1:-}" = "--no-exact" ] && extra="$extra -PexactAlarms=false"
 if [ ! -f keystore.properties ]; then
   echo "keystore.properties is missing: Play needs a bundle signed with your upload key."
   echo "Create the key and the file first: docs/play/RELEASE_STEPS.md, step 2."

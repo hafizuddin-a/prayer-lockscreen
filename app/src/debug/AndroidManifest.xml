@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- Debug builds only: the fake-clock screen is not part of the release manifest. -->
-    <application>
+    <application android:networkSecurityConfig="@xml/network_security_config">
         <activity
             android:name=".DebugClockActivity"
             android:exported="true"

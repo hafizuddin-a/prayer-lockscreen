@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="../../releases/latest"><b>Download</b></a> ·
+  <a href="https://hafizuddin-a.github.io/prayer-lockscreen/download/"><b>Download</b></a> ·
   <a href="#install-on-your-phone"><b>Install</b></a> ·
   <a href="docs/DEVELOPING.md"><b>Build it</b></a> ·
   <a href="https://hafizuddin-a.github.io/prayer-lockscreen/"><b>Privacy policy</b></a> ·
@@ -20,7 +20,7 @@
 
 An Android live wallpaper that draws today's prayer times on the lock screen: two columns, six rows, the prayer that is on now marked, and a
 countdown to the next one. Singapore uses the official MUIS timetable and Hijri calendar; any other place is calculated on the phone.
-Version 1.8.0, for Android 14 and later. No account, no ads, no analytics.
+Version 1.8.1, for Android 14 and later. No account, no ads, no analytics.
 
 ## What it does
 
@@ -43,21 +43,37 @@ Version 1.8.0, for Android 14 and later. No account, no ads, no analytics.
 - **Guided setup.** A fresh install walks you through putting the wallpaper on the lock screen (and checks that it worked), keeping
   notifications from covering the list, reminders, exact alarms and widgets. **Run setup again** is at the bottom of the home screen.
 
-Everything works offline once the Singapore timetable has been downloaded; other places never use the network.
+Everything works offline once the Singapore timetable has been downloaded; other places never use the network for prayer times. (The build from
+GitHub also asks GitHub about new versions: see Updates below.)
 
 ## Install on your phone
 
-Download `prayer-wallpaper-1.8.0.apk` from the [latest release](../../releases/latest). It is signed with the project's release key (certificate
-SHA-256 `7c0fafe65f40f82fd0e3395381672b843c81b2d42f87268b4c263bb771ac7da7`; check it with `apksigner verify --print-certs`).
+Open the **[download page](https://hafizuddin-a.github.io/prayer-lockscreen/download/)** on the phone (or scan the code below). Its button always
+gives the newest APK: `https://github.com/hafizuddin-a/prayer-lockscreen/releases/latest/download/prayer-wallpaper.apk`. The APK is signed with the
+project's release key (certificate SHA-256 `7c0fafe65f40f82fd0e3395381672b843c81b2d42f87268b4c263bb771ac7da7`; check it with
+`apksigner verify --print-certs`, and each release lists the file's own SHA-256).
 
-1. Open the APK on the phone and allow "install unknown apps" for the app you opened it from. Or, with USB debugging on (Settings, About phone,
-   tap *Build number* seven times; then Settings, System, Developer options), run `adb install -r prayer-wallpaper-1.8.0.apk`.
-2. Open **Prayer Live Wallpaper** and follow the setup. On Android's wallpaper screen choose **Lock screen**, so your home screen keeps its own
+<img src="site/assets/download-qr.svg" alt="QR code for the download page" width="150">
+
+1. Tap **Download the app**. If the browser says the file can harm your device, tap **Download anyway**: it says that about any app that is not from
+   Google Play.
+2. Open the file. If Android says it cannot install apps from this source, tap **Settings**, switch on **Allow from this source**, and go back.
+3. If Google Play Protect says **App scan recommended**, tap **Scan app**, then **Install**.
+4. Open **Prayer Live Wallpaper** and follow the setup. On Android's wallpaper screen choose **Lock screen**, so your home screen keeps its own
    wallpaper.
 
-Building it yourself with `tools/build-sideload.sh` gives an APK signed with the Android debug key instead. A phone can only update an app with
-a copy signed by the same key, so switching between your own build, the release APK and a Google Play install means uninstalling first (which
-also resets the app's settings and the wallpaper).
+With USB debugging on (Settings, About phone, tap *Build number* seven times; then Settings, System, Developer options) you can also run
+`adb install -r prayer-wallpaper.apk`.
+
+**Updates.** The app asks GitHub for a newer release when you open it (at most every six hours) and about once a day in the background. When there
+is one, an **Update** button shows on its first screen: tap it, switch on **Allow from this source** for Prayer Live Wallpaper if Android asks, and
+confirm Android's prompt. Android decides whether a later update can go in without a prompt. Switch the check off with **Keep the app up to date**
+under About; **Check for updates** there still works. An update is only installed if it is signed with the same key as the copy you have, which
+the app checks first and Android checks again. This is only in the build from GitHub: the Google Play build has no updater.
+
+Building it yourself with `tools/build-sideload.sh` gives an APK signed with the Android debug key instead, without the updater, because it could
+never install a release signed with another key. A phone can only update an app with a copy signed by the same key, so switching between your own
+build, the release APK and a Google Play install means uninstalling first (which also resets the app's settings and the wallpaper).
 
 **Keeping it working.** The wallpaper does nothing in the background; only the daily timetable refresh and reminders can be delayed by a phone
 maker's aggressive battery rules. Set Settings, Apps, Prayer Live Wallpaper, Battery to **Unrestricted** (the wording varies), turn on an *Autostart* or
@@ -74,9 +90,9 @@ before this app is on the lock screen).
 |---|---|
 | [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) | Where each part of the code lives, and the reasons behind the less obvious choices |
 | [docs/DEVELOPING.md](docs/DEVELOPING.md) | Build, sign, release, debug tools, and the yearly upkeep (Hijri table, timetable, city list) |
-| [docs/play/RELEASE_STEPS.md](docs/play/RELEASE_STEPS.md) | Publishing on Google Play: steps, answers for the forms, the exact alarm declaration |
+| [docs/play/RELEASE_STEPS.md](docs/play/RELEASE_STEPS.md) | Releasing on GitHub, registering the app with Google (Android developer verification), and publishing on Google Play: steps, answers for the forms, the exact alarm declaration |
 | [docs/play/listing.md](docs/play/listing.md) | The store listing text; the graphics are in `docs/play/graphics/` |
-| `site/` | The privacy policy page, published at https://hafizuddin-a.github.io/prayer-lockscreen/ by `.github/workflows/pages.yml` |
+| `site/` | The privacy policy (https://hafizuddin-a.github.io/prayer-lockscreen/) and the download page (`download/`), published by `.github/workflows/pages.yml` |
 
 ## Known limits
 

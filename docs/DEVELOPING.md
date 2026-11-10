@@ -28,11 +28,17 @@ manifest (for the APK and the bundle), the setup's Exact alarms page is left out
 approximate alarms. It exists in case Google Play does not accept the declaration for that permission:
 `./gradlew :app:bundleRelease -PexactAlarms=false`.
 
+**Without the self-updater.** `-PselfUpdate=false` builds without the updater: the same kind of build step removes `REQUEST_INSTALL_PACKAGES` from
+the merged manifest, `BuildConfig.SELF_UPDATE` is false, and the home banner, the About screen's Updates section and the daily job are all off. Google
+Play does not allow an app to update itself, so `tools/build-play-bundle.sh` always uses it. `tools/build-sideload.sh` does too, because a build
+signed with the debug key could never install a release signed with the other key. `tools/build-release-apk.sh` (the build people download from
+GitHub) does not.
+
 ### An APK for your own phone
 
 ```bash
-tools/build-sideload.sh      # runs the tests and lint, builds the release APK, signs it with the Android debug key
-~/Library/Android/sdk/platform-tools/adb install -r build-out/prayer-wallpaper-1.8.0-sideload.apk
+tools/build-sideload.sh      # runs the tests and lint, builds the release APK (without the updater), signs it with the Android debug key
+~/Library/Android/sdk/platform-tools/adb install -r build-out/prayer-wallpaper-1.8.1-sideload.apk
 ```
 
 This needs no key of yours. A phone can only update an app with a copy signed by the same key, so moving between this APK, the GitHub release APK
@@ -47,11 +53,13 @@ one signed with the same key.
 
 ```bash
 tools/build-release-apk.sh   # tests, lint, release APK signed with that key; prints the APK and certificate SHA-256
-gh release create v1.8.0 build-out/prayer-wallpaper-1.8.0.apk --title "Prayer Live Wallpaper 1.8.0" --notes-file notes.md
+gh release create v1.8.1 build-out/prayer-wallpaper.apk --title "Prayer Live Wallpaper 1.8.1" --notes-file notes.md
 ```
 
-Put both checksums in the release notes. For Google Play, `tools/build-play-bundle.sh` builds the signed bundle with the same key as the
-upload key (see `play/RELEASE_STEPS.md`).
+The asset must be called `prayer-wallpaper.apk` in every release: the download page's fixed link and the app's updater both look for that name in
+the newest release. Put both checksums in the release notes. The whole routine, with the checks, is in `play/RELEASE_STEPS.md` (section A), next to
+registering the app with Google (section B). For Google Play, `tools/build-play-bundle.sh` builds the signed bundle with the same key as the
+upload key.
 
 ## Debug tools
 
@@ -92,6 +100,16 @@ adb shell cmd appops set --uid com.prayerwallpaper.app SCHEDULE_EXACT_ALARM deny
 adb shell pm revoke com.prayerwallpaper.app android.permission.POST_NOTIFICATIONS            # to see the notification prompt again
 adb shell dumpsys alarm | grep -A3 "Alarm{.*com.prayerwallpaper.app}"                       # what Android holds
 adb shell dumpsys deviceidle force-idle                                                        # deep Doze; unforce to end it
+
+# The updater: try an update without publishing anything. Read the result with: adb logcat -d -s PrayerUpdate
+python3 -m http.server 8000 --bind 127.0.0.1 --directory srv    # srv/ holds latest.json and the APK; loopback only (the emulator reaches it as 10.0.2.2)
+adb shell am start --activity-clear-task -n com.prayerwallpaper.app/.DebugClockActivity --es updatefeed http://10.0.2.2:8000/latest.json --ez updatecheck true
+#   latest.json has the shape of GitHub's "latest release": {"tag_name":"v1.8.2","draft":false,"prerelease":false,"assets":[{"name":"prayer-wallpaper.apk","size":4078147,"browser_download_url":"http://10.0.2.2:8000/prayer-wallpaper.apk"}]}
+#   --es updatefeed "" goes back to GitHub; --ez updatenow true is what the daily job does, now; --ez updatereset true forgets what was found
+#   Always launch with --activity-clear-task, or the running screen ignores the extras. A debug APK can only update to another debug-key build, and on a
+#   Play emulator Google Play Protect blocks debug builds as "Harmful app" at Android's install step: everything before that step can be tried this way.
+#   The signed release APK is not blocked (it shows "App scan recommended", then "This app looks safe": checked 11 November 2026), but its feed is
+#   always GitHub: test that one against a real release.
 
 # Other
 adb shell am broadcast -a com.prayerwallpaper.app.DUMP_A11Y -p com.prayerwallpaper.app ; adb logcat -d -s A11yDump

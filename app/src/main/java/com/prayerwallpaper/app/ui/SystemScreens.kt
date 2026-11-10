@@ -26,6 +26,9 @@ internal object SystemScreens {
     /** The screen where the person allows this app to set exact alarms. */
     fun exactAlarms(context: Context) = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM, "package:${context.packageName}".toUri())
 
+    /** Where the person lets this app install apps (here, its own updates): a switch, "Allow from this source". */
+    fun unknownSources(context: Context) = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, "package:${context.packageName}".toUri())
+
     /** The list of apps and their battery optimisation. Opening it asks for no permission, unlike the direct request, which this app never makes. */
     fun battery() = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 

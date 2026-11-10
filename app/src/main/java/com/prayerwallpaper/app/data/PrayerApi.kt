@@ -7,6 +7,7 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import com.prayerwallpaper.app.BuildConfig
 import java.io.IOException
 import java.net.HttpURLConnection
 import java.net.URL
@@ -18,16 +19,20 @@ fun interface HttpGet {
 /** Non-200 response. [code] 429 means we are being rate limited. */
 class HttpStatusException(val code: Int, val retryAfterSeconds: Long?) : IOException("HTTP $code")
 
-/** HTTPS only. The API key is only ever set in debug builds. */
-class UrlConnectionHttp(private val apiKey: String = "") : HttpGet {
+/**
+ * HTTPS only (a debug build also reaches the computer the emulator runs on, to try updates). The API key is only ever set in debug builds.
+ * [headers] replace the defaults, such as the `Accept` header.
+ */
+class UrlConnectionHttp(private val apiKey: String = "", private val headers: Map<String, String> = emptyMap()) : HttpGet {
     override fun get(url: String): String {
-        require(url.startsWith("https://")) { "HTTPS only" }
+        require(url.startsWith("https://") || (BuildConfig.DEBUG && url.startsWith("http://10.0.2.2:"))) { "HTTPS only" }
         val connection = URL(url).openConnection() as HttpURLConnection
         try {
             connection.connectTimeout = 15_000
             connection.readTimeout = 30_000
             connection.setRequestProperty("Accept", "application/json")
             if (apiKey.isNotEmpty()) connection.setRequestProperty("x-api-key", apiKey)
+            headers.forEach { (name, value) -> connection.setRequestProperty(name, value) }
             val code = connection.responseCode
             if (code != 200) {
                 throw HttpStatusException(code, connection.getHeaderField("Retry-After")?.toLongOrNull())
