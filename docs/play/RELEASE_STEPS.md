@@ -27,9 +27,14 @@ For each release:
    should end in a 200 and the APK's size. Phones with the app see the release within a day, or at once with **Check for updates** under About.
 
 Do not replace a published release's APK with a different file under the same version (phones that have that version would never be offered the
-fix), and do not publish a pre-release or draft expecting phones to get it: the app ignores both. An update from the first GitHub install of an
-older release asks for a tap and Android's prompt; Android lets an app install without a prompt only when that app installed the running copy, so
-later updates can go in on their own.
+fix), and do not publish a pre-release or draft expecting phones to get it: the app ignores both.
+
+What a person sees, checked on the emulator on 11 November 2026 (1.8.0, installed from a file, updating to the published 1.8.1): the home screen
+shows **Update available**, **Update** leads to **Allow updates** (Android's **Install unknown apps** page, switched on once), the app downloads
+from GitHub, checks the file, and Android asks **Update this app?**. A file Google has not seen yet can also bring up Play Protect's **App scan
+recommended** (it did not for 1.8.1, which had been scanned once already: see step 3). Afterwards `dumpsys package` showed the app itself as the
+installer (`installerPackageName=com.prayerwallpaper.app`), which is what lets Android skip its prompt for later updates. That quiet case has not
+been seen yet: the first release after 1.8.1 is its test.
 
 The page and the privacy policy are in `site/`: edit, push to `main`, and `.github/workflows/pages.yml` publishes them in about a minute.
 `site/assets/download-qr.svg` is a QR code for the download page's address (made with `swift tools/make-qr.swift`; scan the result with a phone

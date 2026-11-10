@@ -97,7 +97,8 @@ before this app is on the lock screen).
 ## Known limits
 
 - So far everything was checked on an Android 16 emulator and by unit tests. Not yet tested end to end on a real phone: a phone maker's launcher,
-  battery rules, lock screen layout and fonts, and real TalkBack.
+  battery rules, lock screen layout and fonts, and real TalkBack. The updater was run end to end on the emulator (1.8.0 updating to the published
+  1.8.1 from GitHub); an update that Android installs with no prompt at all has not been seen yet.
 - The widgets' alarms are inexact, so a widget can redraw up to about ten minutes after a prayer time (the countdown itself never lags), and the
   one-minute Syuruk mark may show late or not at all on a widget. The lock screen redraws on the minute.
 - Singapore data stops at the end of the cached year until the next timetable is published and fetched (late November). The Hijri table runs out
