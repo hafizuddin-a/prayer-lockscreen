@@ -10,6 +10,11 @@ import com.prayerwallpaper.app.logic.ReleaseInfo
 class UpdateStore(private val prefs: SharedPreferences) {
     fun lastCheckMillis(): Long = prefs.getLong(LAST_CHECK, 0)
 
+    /** When the app's last check failed (no network, GitHub busy), or 0. Its own checks wait a while after that; a person's own check does not. */
+    fun lastFailureMillis(): Long = prefs.getLong(LAST_FAILURE, 0)
+
+    fun recordFailure(nowMillis: Long) = prefs.edit().putLong(LAST_FAILURE, nowMillis).apply()
+
     /** The newest release seen at the last check, whether or not it is newer than the running app. Null when there was none. */
     fun known(): ReleaseInfo? {
         val version = prefs.getString(VERSION, null) ?: return null
@@ -21,6 +26,7 @@ class UpdateStore(private val prefs: SharedPreferences) {
     fun record(nowMillis: Long, release: ReleaseInfo?) {
         prefs.edit().apply {
             putLong(LAST_CHECK, nowMillis)
+            remove(LAST_FAILURE)
             if (release == null) {
                 remove(VERSION); remove(URL); remove(BYTES)
             } else {
@@ -38,10 +44,11 @@ class UpdateStore(private val prefs: SharedPreferences) {
 
     fun setDebugFeed(url: String?) = prefs.edit().apply { if (url.isNullOrBlank()) remove(DEBUG_FEED) else putString(DEBUG_FEED, url) }.apply()
 
-    fun clear() = prefs.edit().remove(LAST_CHECK).remove(VERSION).remove(URL).remove(BYTES).remove(NOTIFIED).apply()
+    fun clear() = prefs.edit().remove(LAST_CHECK).remove(LAST_FAILURE).remove(VERSION).remove(URL).remove(BYTES).remove(NOTIFIED).apply()
 
     private companion object {
         const val LAST_CHECK = "last_check"
+        const val LAST_FAILURE = "last_failure"
         const val VERSION = "version"
         const val URL = "apk_url"
         const val BYTES = "apk_bytes"

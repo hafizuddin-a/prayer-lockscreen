@@ -51,7 +51,8 @@ Needs Android 14 or newer. The page walks through the few steps Android asks for
 |---|---|
 | [docs/DEVELOPING.md](docs/DEVELOPING.md) | Build, sign, release, debug tools, yearly upkeep |
 | [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) | Where each part of the code lives and why |
-| [docs/play/RELEASE_STEPS.md](docs/play/RELEASE_STEPS.md) | GitHub releases, Google's developer verification, Google Play |
+| [docs/play/RELEASE_STEPS.md](docs/play/RELEASE_STEPS.md) | GitHub releases, Google's developer verification, keeping the signing key safe, Google Play |
+| [SECURITY.md](SECURITY.md) | Reporting a problem, checking a download |
 
 `tools/build-sideload.sh` builds an APK you can install yourself (signed with the debug key, so it can't update to the release APK without uninstalling first).
 

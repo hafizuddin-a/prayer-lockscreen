@@ -23,6 +23,7 @@ Developer notes for Prayer Live Wallpaper: where each part of the code lives and
 | Reminders: the scheduler, the alarm and notification services, the receivers | `reminders/` (`Reminders`, `AlarmGateway`, `ReminderNotifier`, `ReminderReceiver`, `ReminderTriggerReceiver`), `work/ReminderCheckWorker.kt` |
 | Reminder health: the rules, the screen, the share text | `logic/ReminderHealth.kt`, `logic/ReminderShare.kt`, `reminders/AndroidHealth.kt`, `ui/ReminderHealthScreen.kt`, `ui/RemindersUi.kt` |
 | Daily refresh job (Singapore only) | `work/RefreshWorker.kt` |
+| Background work that must never crash the app: a guarded thread and a guarded `goAsync` | `Background.kt` (`inBackground`, `goAsyncGuarded`): every thread the app starts goes through it, because an uncaught exception on a thread of its own ends the whole app, and Android resets a live wallpaper whose app crashes |
 | Updating itself from GitHub: which release is newer, which file, the checks, the install (not in a Play build) | `logic/AppUpdate.kt` (pure, tested), `update/` (`UpdateManager`, `UpdateStore`, `UpdateState`, `UpdateNotifier`, `UpdateInstallReceiver`), `work/UpdateWorker.kt`, `ui/UpdateUi.kt` (the home banner and the About section) |
 | The wallpaper: drawing and redraw triggers | `wallpaper/PrayerWallpaperService.kt`, `wallpaper/WallpaperRenderer.kt` |
 | Settings, photo copy, colour capture | `settings/` |
@@ -48,7 +49,7 @@ Things worth knowing:
   person's own **Allow from this source** (`SystemScreens.unknownSources`). When Android wants a tap it hands back an intent: the app starts it if
   its screen is in front, otherwise posts a notification (only if notifications are already allowed), and the home banner covers the rest. The
   app asks when it opens (`onAppResumed`, at most once a month) and through `UpdateWorker` once a month, both only while **Keep the app up to date**
-  is on; **Check for updates** always asks. `-PselfUpdate=false` removes all of it, and the permission, which Google Play needs. Play Protect blocked
+  is on; **Check for updates** always asks. The checks are deliberately strict: an address is trusted only on `github.com` over HTTPS under this repository's `releases/download/` with no dot segments, login part or odd port (`isTrustedApkUrl`); the file is saved under a fixed name and never written past the size GitHub declared (or 64 MB); the signer check accepts the same key or a rotated one that carries the installed key in its history (`signersContinue`); and the "tap to finish" screen Android hands back is started only if it is the installer's confirm action for one of this app's own sessions, aimed at another package, with no data attached (`isSafeInstallConfirmation`, with flags reset to a plain new task). After a failed check the app's own checks wait six hours; a person's own check never waits. A final release is later than a pre-release with the same numbers. `-PselfUpdate=false` removes all of it, and the permission, which Google Play needs. Play Protect blocked
   a debug build as "Harmful app" but showed only its usual "App scan recommended", then "This app looks safe", for the signed release build (Play
   emulator, 11 November 2026), so test the real APK, not a debug one.
 - **Friday.** `PrayerDay.label(prayer, names)` gives the Friday prayer's name on a Friday (Jumaat or Jumuah in place of

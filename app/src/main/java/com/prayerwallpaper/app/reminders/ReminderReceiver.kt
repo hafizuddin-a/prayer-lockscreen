@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.prayerwallpaper.app.PrayerApp
+import com.prayerwallpaper.app.goAsyncGuarded
 import com.prayerwallpaper.app.data.Prayer
 import com.prayerwallpaper.app.logic.ReminderKind
 import java.time.Instant
@@ -20,14 +21,7 @@ class ReminderReceiver : BroadcastReceiver() {
         val kind = intent.getStringExtra(EXTRA_KIND)?.let { name -> ReminderKind.entries.firstOrNull { it.name == name } } ?: return
         val prayer = intent.getStringExtra(EXTRA_PRAYER)?.let { name -> Prayer.entries.firstOrNull { it.name == name } }
         val app = context.applicationContext as PrayerApp
-        val pending = goAsync()
-        Thread {
-            try {
-                app.reminders.onAlarm(Instant.ofEpochMilli(plannedAt), kind, prayer)
-            } finally {
-                pending.finish()
-            }
-        }.start()
+        goAsyncGuarded("ReminderReceiver") { app.reminders.onAlarm(Instant.ofEpochMilli(plannedAt), kind, prayer) }
     }
 
     companion object {

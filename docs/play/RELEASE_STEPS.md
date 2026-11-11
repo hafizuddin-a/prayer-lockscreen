@@ -75,6 +75,28 @@ Notes. A package can have more than one key (Add key on its page), which is how 
 is registered alongside this one. **If the key is lost the app cannot be registered or updated**: keep `~/prayer-wallpaper-upload.jks` and its
 password in two places. Check the status in the Console, or with Android Studio Panda 4 or later when it builds a signed APK.
 
+## C. Keeping the signing key safe
+
+Three things matter: the key file `~/prayer-wallpaper-upload.jks` (alias `upload`), its store password and its key password (both in
+`keystore.properties`, which is git-ignored). **Lose them** and no release can ever update the phones that already have the app (people would have
+to uninstall, losing their settings), and the app cannot be registered or re-registered with Google. **Leak them** and someone could sign an update
+Android accepts as yours. So the key needs a copy that survives your Mac and a copy that stays secret.
+
+1. **Password manager.** One secure note, "Prayer Live Wallpaper signing key": the alias, both passwords, the certificate SHA-256
+   (`7C:0F:AF:E6:...:7D:A7`) and where the file lives. If the manager can attach files (1Password, Bitwarden Premium), attach the `.jks` too.
+2. **An encrypted copy away from the Mac.** Put the `.jks` in an encrypted disk image (the passphrase is a new one, kept in the password manager),
+   then copy the image to a USB stick kept elsewhere, and to one more place (an encrypted image is safe in a cloud drive too):
+   `hdiutil create -size 5m -fs APFS -encryption AES-256 -volname signing-key ~/signing-key.dmg` (it asks for the passphrase), open the image, copy the
+   file in, eject.
+3. **Test a copy now, and once a year.** Copy the `.jks` out of the backup to a temporary folder and run
+   `keytool -list -v -keystore <that copy> -alias upload`. It must ask for the password and show SHA-256 `7C:0F:AF:E6:5F:40:F8:2F:D0:E3:39:53:81:67:2B:84:3C:81:B2:D4:2F:87:26:8B:4C:26:3B:B7:71:AC:7D:A7`.
+4. **Never** email the key, commit it, put it unencrypted in iCloud, Dropbox or Drive, or keep the password only in the folder beside it.
+5. **The Mac itself.** FileVault on, a strong login password, and Time Machine backups encrypted. `git clean -fdx` deletes ignored files, including
+   `keystore.properties` (the passwords, not the key file): keep the passwords in the password manager, not only there.
+
+If the key ever leaks, Android's key rotation (`apksigner rotate`, which needs the old key to prove the link) lets phones follow to a new key, and the
+Console lets a package have more than one key: so keep the old key even after a rotation, and register the new one.
+
 ## Google Play: where things stand (25 October 2026)
 
 The Play bundle is built with `tools/build-play-bundle.sh`, which always passes `-PselfUpdate=false`: Google Play does not allow an app to update

@@ -43,7 +43,7 @@ class UpdateNotifier(private val context: Context) {
 
     /** Android wants a tap to finish the install and the app is not on screen: tapping this shows Android's own prompt. */
     fun postReady(confirm: Intent, release: ReleaseInfo) {
-        val prompt = PendingIntent.getActivity(context, 1, confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK), PendingIntent.FLAG_IMMUTABLE)
+        val prompt = PendingIntent.getActivity(context, 1, confirm, PendingIntent.FLAG_IMMUTABLE)
         post(ID_READY, "Finish updating", "Tap to install version ${release.version}.", prompt)
     }
 

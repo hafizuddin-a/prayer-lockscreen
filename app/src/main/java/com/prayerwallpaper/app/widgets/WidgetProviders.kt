@@ -5,6 +5,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.os.Bundle
 import com.prayerwallpaper.app.PrayerApp
+import com.prayerwallpaper.app.goAsyncGuarded
 
 /**
  * The base of the three widget providers. Every event that can change what a widget shows asks the app to update all of them: the
@@ -26,14 +27,7 @@ abstract class PrayerWidgetProvider : AppWidgetProvider() {
 
     private fun refresh(context: Context, reason: String) {
         val app = context.applicationContext as PrayerApp
-        val pending = goAsync()
-        Thread {
-            try {
-                app.widgets.updateAllDebounced(reason)
-            } finally {
-                pending.finish()
-            }
-        }.start()
+        goAsyncGuarded("WidgetProvider") { app.widgets.updateAllDebounced(reason) }
     }
 }
 

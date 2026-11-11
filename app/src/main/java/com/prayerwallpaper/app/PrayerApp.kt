@@ -114,7 +114,7 @@ class PrayerApp : Application() {
         settings.update(sync) { it.withPlace(place) }
         syncBackgroundJobs()
         // The times for the new place decide the next reminder.
-        Thread { reminders.ensureScheduled("place changed") }.start()
+        inBackground("PrayerApp") { reminders.ensureScheduled("place changed") }
     }
 
     /**
@@ -179,7 +179,7 @@ class PrayerApp : Application() {
     // SharedPreferences keeps its listeners weakly, so this field is what keeps the listener alive.
     private val widgetSettingsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key -> if (key !in LOCK_SCREEN_ONLY_KEYS) widgetsRefreshSoon() }
     private val handler = Handler(Looper.getMainLooper())
-    private val refreshWidgets = Runnable { Thread { widgets.updateAll("settings") }.start() }
+    private val refreshWidgets = Runnable { inBackground("PrayerApp") { widgets.updateAll("settings") } }
 
     /** Any setting can change what a widget shows (the place, the names, the Hijri line, the style). Several changes at once become one update. */
     private fun widgetsRefreshSoon() {
@@ -190,7 +190,7 @@ class PrayerApp : Application() {
     /** The phone's font scale, language or density changed while the app was running: the widgets are laid out for the old ones. */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        Thread { widgets.refreshIfStale("configuration changed") }.start()
+        inBackground("PrayerApp") { widgets.refreshIfStale("configuration changed") }
     }
 
     override fun onCreate() {
@@ -203,13 +203,13 @@ class PrayerApp : Application() {
     }
 
     /** Debug aid for the Phase 0 checkpoint: today's six times from the cache, in logcat. */
-    private fun logToday() = Thread {
+    private fun logToday() = inBackground("PrayerApp") {
         val snapshot = timetable().snapshot(clock)
         val times = snapshot.day?.let { day -> day.times.joinToString { it.toString() } } ?: "no data for today"
         Log.i("PrayerData", "day=${snapshot.day?.date} times=[$times] highlight=${snapshot.highlight}")
         Log.i("PrayerData", "system accessibility: ${systemAccessibility()} -> ${accessOptions(settings.read())}")
         Log.i("PrayerData", "hijriLine=${hijriLine(settings.read(), timetable())?.let { it.date.text + (it.event?.let { e -> " | $e" } ?: "") } ?: "none"} certainThrough=${hijri.lastKnownDate} daysLeft=${hijri.daysLeft()}")
-    }.start()
+    }
 }
 
 /** Settings only the lock screen's drawing uses, and that change many times a second while a slider is dragged: they do not touch the widgets. */

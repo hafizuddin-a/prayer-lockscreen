@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import com.prayerwallpaper.app.BuildConfig
 import com.prayerwallpaper.app.PrayerApp
+import com.prayerwallpaper.app.goAsyncGuarded
 import java.time.Instant
 
 /**
@@ -19,21 +20,16 @@ class WidgetReceiver : BroadcastReceiver() {
         if (BuildConfig.DEBUG) Log.i("WidgetReceiver", "$action delivered at ${Instant.now()}")
         val app = context.applicationContext as PrayerApp
         val boundary = intent.getLongExtra(WidgetScheduler.EXTRA_BOUNDARY, -1L).takeIf { it >= 0 }?.let(Instant::ofEpochMilli)
-        val pending = goAsync()
-        Thread {
-            try {
-                when (action) {
-                    WidgetScheduler.ACTION_BOUNDARY -> app.widgets.updateAll("boundary alarm")
-                    WidgetScheduler.ACTION_SAFETY -> app.widgets.onSafetyAlarm(boundary)
-                    Intent.ACTION_BOOT_COMPLETED -> app.widgets.updateAll("boot")
-                    Intent.ACTION_MY_PACKAGE_REPLACED -> app.widgets.updateAll("app updated")
-                    Intent.ACTION_TIME_CHANGED -> app.widgets.updateAll("time changed")
-                    Intent.ACTION_TIMEZONE_CHANGED -> app.widgets.updateAll("time zone changed")
-                    Intent.ACTION_LOCALE_CHANGED -> app.widgets.updateAll("language changed")
-                }
-            } finally {
-                pending.finish()
+        goAsyncGuarded("WidgetReceiver") {
+            when (action) {
+                WidgetScheduler.ACTION_BOUNDARY -> app.widgets.updateAll("boundary alarm")
+                WidgetScheduler.ACTION_SAFETY -> app.widgets.onSafetyAlarm(boundary)
+                Intent.ACTION_BOOT_COMPLETED -> app.widgets.updateAll("boot")
+                Intent.ACTION_MY_PACKAGE_REPLACED -> app.widgets.updateAll("app updated")
+                Intent.ACTION_TIME_CHANGED -> app.widgets.updateAll("time changed")
+                Intent.ACTION_TIMEZONE_CHANGED -> app.widgets.updateAll("time zone changed")
+                Intent.ACTION_LOCALE_CHANGED -> app.widgets.updateAll("language changed")
             }
-        }.start()
+        }
     }
 }

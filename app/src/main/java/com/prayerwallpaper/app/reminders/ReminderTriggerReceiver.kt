@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import com.prayerwallpaper.app.PrayerApp
+import com.prayerwallpaper.app.goAsyncGuarded
 
 /**
  * Puts the reminder alarm back after anything that can lose it: a reboot (alarms do not survive one), the app being updated, the
@@ -14,14 +15,7 @@ class ReminderTriggerReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val action = intent.action ?: return
         val app = context.applicationContext as PrayerApp
-        val pending = goAsync()
-        Thread {
-            try {
-                // Always forced: after any of these, the pending intent may still exist while the alarm itself is gone.
-                app.reminders.ensureScheduled(action.substringAfterLast('.'))
-            } finally {
-                pending.finish()
-            }
-        }.start()
+        // Always forced: after any of these, the pending intent may still exist while the alarm itself is gone.
+        goAsyncGuarded("ReminderTrigger") { app.reminders.ensureScheduled(action.substringAfterLast('.')) }
     }
 }

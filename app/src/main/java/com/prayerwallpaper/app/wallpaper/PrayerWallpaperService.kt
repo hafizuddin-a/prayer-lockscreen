@@ -17,6 +17,7 @@ import java.time.Instant
 import com.prayerwallpaper.app.AppClock
 import com.prayerwallpaper.app.BuildConfig
 import com.prayerwallpaper.app.PrayerApp
+import com.prayerwallpaper.app.inBackground
 import com.prayerwallpaper.app.data.snapshot
 import com.prayerwallpaper.app.logic.PrayerSnapshot
 import com.prayerwallpaper.app.logic.SINGAPORE
@@ -108,9 +109,9 @@ class PrayerWallpaperService : WallpaperService() {
             if (visible) {
                 redraw("visible")
                 // Reminders: make sure the next alarm is still set. Throttled to once in 30 minutes and off the main thread.
-                Thread { app.reminders.ensureScheduledThrottled("visible") }.start()
+                inBackground(TAG) { app.reminders.ensureScheduledThrottled("visible") }
                 // Widgets: redraw them if they still show an older picture than the latest boundary. Throttled to once in five minutes.
-                Thread { app.widgets.refreshIfStale() }.start()
+                inBackground(TAG) { app.widgets.refreshIfStale() }
             } else {
                 handler.removeCallbacks(boundaryTimer)
             }

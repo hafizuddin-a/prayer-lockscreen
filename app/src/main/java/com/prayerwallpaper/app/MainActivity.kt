@@ -37,10 +37,10 @@ class MainActivity : ComponentActivity() {
         resumes++
         // The settings app opening is a moment to bring the widgets up to date, off the main thread.
         val app = application as PrayerApp
-        Thread {
+        inBackground("MainActivity") {
             app.widgets.updateAll("app opened")
             app.widgets.publishPreviews()
-        }.start()
+        }
         // Looks for a new version if it is time (the build downloaded from GitHub only), and goes on with an update that was waiting for a permission.
         app.updates.onAppResumed()
     }

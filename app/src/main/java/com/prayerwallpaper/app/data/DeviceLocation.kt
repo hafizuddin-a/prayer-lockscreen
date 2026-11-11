@@ -58,6 +58,8 @@ object DeviceLocation {
                 manager.getLastKnownLocation(provider)
             } catch (_: SecurityException) {
                 null
+            } catch (_: IllegalArgumentException) {
+                null
             }
             if (location != null) return LocationResult.Found(location.latitude, location.longitude)
         }
@@ -72,6 +74,9 @@ object DeviceLocation {
             try {
                 manager.getCurrentLocation(provider, signal, executor) { location -> if (continuation.isActive) continuation.resume(location) }
             } catch (_: SecurityException) {
+                if (continuation.isActive) continuation.resume(null)
+            } catch (_: IllegalArgumentException) {
+                // A provider that was listed a moment ago and is not there now: no fix from it.
                 if (continuation.isActive) continuation.resume(null)
             }
         }

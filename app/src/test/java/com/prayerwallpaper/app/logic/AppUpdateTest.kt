@@ -130,4 +130,67 @@ class AppUpdateTest {
         assertTrue(installFailureMessage(2)!!.contains("Allow"))
         assertTrue(installFailureMessage(1)!!.isNotBlank())
     }
+
+    // --- hardening ---
+
+    @Test fun `a final release is later than a pre-release of the same numbers, never the other way round`() {
+        assertTrue(isNewerVersion("1.9.0", "1.9.0-rc1"))
+        assertFalse(isNewerVersion("1.9.0-rc1", "1.9.0"))
+        assertFalse(isNewerVersion("1.9.0-rc2", "1.9.0-rc1")) // cannot tell; Android still needs a higher versionCode
+        assertTrue(isNewerVersion("1.9.1-rc1", "1.9.0")) // different numbers decide first
+        assertFalse(isNewerVersion("1.9.0+build5", "1.9.0")) // build metadata is not a pre-release
+    }
+
+    @Test fun `an address that climbs out of the releases folder, or says more than where it goes, is not trusted`() {
+        val base = "https://github.com/hafizuddin-a/prayer-lockscreen/releases/download/"
+        assertTrue(isTrustedApkUrl(base + "v1.8.4/prayer-wallpaper.apk", debug = false))
+        assertFalse(isTrustedApkUrl(base + "../../../someone/else/releases/download/v1/a.apk", debug = false))
+        assertFalse(isTrustedApkUrl(base + "v1/%2e%2e/%2e%2e/x.apk", debug = false))
+        assertFalse(isTrustedApkUrl(base + "v1/..%2Fx.apk", debug = false))
+        assertFalse(isTrustedApkUrl(base + "v1\\..\\x.apk", debug = false))
+        assertFalse(isTrustedApkUrl("https://evil@github.com/hafizuddin-a/prayer-lockscreen/releases/download/v1/a.apk", debug = false))
+        assertFalse(isTrustedApkUrl("https://github.com:8443/hafizuddin-a/prayer-lockscreen/releases/download/v1/a.apk", debug = false))
+        assertFalse(isTrustedApkUrl(base + "v1/a.apk#frag", debug = false))
+        assertFalse(isTrustedApkUrl("https://github.com/hafizuddin-a/prayer-lockscreen/releases/other/a.apk", debug = false))
+        assertFalse(isTrustedApkUrl("not a url", debug = false))
+        assertFalse(isTrustedApkUrl("http://10.0.2.2/prayer-wallpaper.apk", debug = true)) // the emulator address needs a port
+    }
+
+    @Test fun `a download may be no larger than GitHub said, or the general limit`() {
+        assertEquals(4_078_147L, downloadLimit(4_078_147L))
+        assertEquals(MAX_APK_BYTES, downloadLimit(0))
+        assertEquals(MAX_APK_BYTES, downloadLimit(-5))
+        assertEquals(MAX_APK_BYTES, downloadLimit(MAX_APK_BYTES + 1)) // a claim bigger than the limit does not raise it
+    }
+
+    @Test fun `after a failed check the app's own checks wait, a person's own check does not`() {
+        val last = 1_000_000_000_000L
+        val failed = last + 31 * 24 * hour // a check is due, and the last attempt failed just now
+        assertFalse(shouldCheckForUpdate(failed + hour, last, force = false, lastFailureMillis = failed))
+        assertTrue(shouldCheckForUpdate(failed + 6 * hour, last, force = false, lastFailureMillis = failed))
+        assertTrue(shouldCheckForUpdate(failed + hour, last, force = true, lastFailureMillis = failed))
+        assertTrue(shouldCheckForUpdate(failed - hour, last, force = false, lastFailureMillis = failed)) // a failure stamped in the future (clock moved) is ignored
+    }
+
+    @Test fun `signers continue when they are the same, or when the update carries the installed one in its history`() {
+        val k1 = setOf("aa"); val k2 = setOf("bb")
+        assertTrue(signersContinue(k1, k1, k1))
+        assertTrue(signersContinue(k1, k2, setOf("aa", "bb"))) // a rotated key
+        assertFalse(signersContinue(k1, k2, k2)) // a different key with no link to the old one
+        assertFalse(signersContinue(emptySet(), k1, k1))
+        assertFalse(signersContinue(k1, emptySet(), emptySet()))
+    }
+
+    @Test fun `only the installer's own confirm screen for one of this app's sessions is started`() {
+        val confirm = "android.content.pm.action.CONFIRM_INSTALL"
+        val mine = setOf(7, 9)
+        assertTrue(isSafeInstallConfirmation(confirm, "com.google.android.packageinstaller", "com.prayerwallpaper.app", false, 7, mine))
+        assertTrue(isSafeInstallConfirmation(confirm, "com.android.packageinstaller", "com.prayerwallpaper.app", false, null, mine)) // no session named
+        assertFalse(isSafeInstallConfirmation("android.intent.action.VIEW", "com.google.android.packageinstaller", "com.prayerwallpaper.app", false, 7, mine))
+        assertFalse(isSafeInstallConfirmation(null, "com.google.android.packageinstaller", "com.prayerwallpaper.app", false, 7, mine))
+        assertFalse(isSafeInstallConfirmation(confirm, "com.prayerwallpaper.app", "com.prayerwallpaper.app", false, 7, mine)) // this app's own screens
+        assertFalse(isSafeInstallConfirmation(confirm, null, "com.prayerwallpaper.app", false, 7, mine))
+        assertFalse(isSafeInstallConfirmation(confirm, "com.google.android.packageinstaller", "com.prayerwallpaper.app", true, 7, mine)) // carries data
+        assertFalse(isSafeInstallConfirmation(confirm, "com.google.android.packageinstaller", "com.prayerwallpaper.app", false, 99, mine)) // someone else's session
+    }
 }

@@ -12,11 +12,13 @@ import com.prayerwallpaper.app.data.HttpStatusException
 import com.prayerwallpaper.app.data.UrlConnectionHttp
 import com.prayerwallpaper.app.logic.ReleaseInfo
 import com.prayerwallpaper.app.logic.UpdateSource
+import com.prayerwallpaper.app.logic.downloadLimit
 import com.prayerwallpaper.app.logic.installFailureMessage
 import com.prayerwallpaper.app.logic.isNewerVersion
 import com.prayerwallpaper.app.logic.isTrustedApkUrl
 import com.prayerwallpaper.app.logic.mayInstallWithoutAsking
 import com.prayerwallpaper.app.logic.parseLatestRelease
+import com.prayerwallpaper.app.logic.signersContinue
 import com.prayerwallpaper.app.logic.shouldCheckForUpdate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -83,7 +85,7 @@ class UpdateManager(private val app: PrayerApp) {
         val current = _state.value
         if (current is UpdateState.Downloading || current is UpdateState.Installing) return null
         val now = System.currentTimeMillis()
-        if (!shouldCheckForUpdate(now, store.lastCheckMillis(), force)) return store.known()?.takeIf(::isUpdate)
+        if (!shouldCheckForUpdate(now, store.lastCheckMillis(), force, store.lastFailureMillis())) return store.known()?.takeIf(::isUpdate)
         if (!quiet) _state.value = UpdateState.Checking
         return try {
             val release = parseLatestRelease(http.get(feedUrl()))
@@ -98,11 +100,13 @@ class UpdateManager(private val app: PrayerApp) {
                 _state.value = UpdateState.UpToDate(Instant.ofEpochMilli(now))
             } else {
                 Log.w(TAG, "check failed: $e")
+                store.recordFailure(now)
                 _state.value = if (quiet) current.keepIfUseful() else UpdateState.Failed(null, "GitHub didn't answer. Try again later.")
             }
             null
         } catch (e: Exception) {
             Log.w(TAG, "check failed: $e")
+            store.recordFailure(now)
             _state.value = if (quiet) current.keepIfUseful() else UpdateState.Failed(null, "Can't reach GitHub. Check your connection.")
             null
         }
@@ -162,15 +166,20 @@ class UpdateManager(private val app: PrayerApp) {
     private fun download(release: ReleaseInfo, progress: (Long) -> Unit): File {
         require(isTrustedApkUrl(release.apkUrl, BuildConfig.DEBUG)) { "not an address updates may come from" }
         cacheDir.mkdirs()
-        val target = File(cacheDir, "prayer-wallpaper-${release.version}.apk")
-        val part = File(cacheDir, target.name + ".part")
+        // A fixed name: nothing from the release's own text becomes part of a path.
+        val target = File(cacheDir, "update.apk")
+        val part = File(cacheDir, "update.apk.part")
+        target.delete()
+        val limit = downloadLimit(release.apkBytes)
         val connection = URL(release.apkUrl).openConnection() as HttpURLConnection
+        var finished = false
         try {
             connection.connectTimeout = 15_000
             connection.readTimeout = 30_000
             connection.setRequestProperty("User-Agent", USER_AGENT)
             // GitHub answers with a redirect to its file servers; both ends are HTTPS, so it is followed.
             if (connection.responseCode != 200) throw HttpStatusException(connection.responseCode, null)
+            if (connection.contentLengthLong > limit) throw IOException("the file is larger than the $limit bytes expected")
             var total = 0L
             var reported = 0L
             connection.inputStream.use { input ->
@@ -179,6 +188,8 @@ class UpdateManager(private val app: PrayerApp) {
                     while (true) {
                         val n = input.read(buffer)
                         if (n < 0) break
+                        // Never write past what was expected, whatever the server keeps sending.
+                        if (total + n > limit) throw IOException("the download is larger than the $limit bytes expected")
                         out.write(buffer, 0, n)
                         total += n
                         if (total - reported >= REPORT_EVERY_BYTES) {
@@ -189,14 +200,13 @@ class UpdateManager(private val app: PrayerApp) {
                 }
             }
             progress(total)
-            if (release.apkBytes > 0 && total != release.apkBytes) {
-                part.delete()
-                throw IOException("the download is $total bytes, GitHub said ${release.apkBytes}")
-            }
+            if (release.apkBytes > 0 && total != release.apkBytes) throw IOException("the download is $total bytes, GitHub said ${release.apkBytes}")
             if (!part.renameTo(target)) throw IOException("could not move the download into place")
+            finished = true
             return target
         } finally {
             connection.disconnect()
+            if (!finished) part.delete()
         }
     }
 
@@ -207,15 +217,17 @@ class UpdateManager(private val app: PrayerApp) {
         if (archive.packageName != app.packageName) return "The download is not for this app."
         val installed = pm.getPackageInfo(app.packageName, PackageManager.GET_SIGNING_CERTIFICATES)
         if (archive.longVersionCode <= installed.longVersionCode) return "This version is already installed."
-        val theirs = signers(archive)
-        if (theirs.isEmpty() || theirs != signers(installed)) return installFailureMessage(INCOMPATIBLE)
+        // The same key, or a key that was rotated from the installed one (Android allows that, and decides for itself in the end).
+        val history = archive.signingInfo?.signingCertificateHistory.orEmpty().map(::fingerprint).toSet()
+        if (!signersContinue(signers(installed), signers(archive), history)) return installFailureMessage(INCOMPATIBLE)
         return null
     }
 
     private fun signers(info: android.content.pm.PackageInfo): Set<String> =
-        info.signingInfo?.apkContentsSigners.orEmpty().map { signature ->
-            MessageDigest.getInstance("SHA-256").digest(signature.toByteArray()).joinToString("") { "%02x".format(it) }
-        }.toSet()
+        info.signingInfo?.apkContentsSigners.orEmpty().map(::fingerprint).toSet()
+
+    private fun fingerprint(signature: android.content.pm.Signature): String =
+        MessageDigest.getInstance("SHA-256").digest(signature.toByteArray()).joinToString("") { "%02x".format(it) }
 
     /** Gives the APK to Android's installer. The result comes to [UpdateInstallReceiver]. */
     private fun commit(file: File) {
@@ -245,12 +257,14 @@ class UpdateManager(private val app: PrayerApp) {
 
     // --- what Android answers ---
 
-    /** Android needs a tap to finish. On screen: show its prompt. Otherwise a notification, if allowed, else the Update button next time. */
+    /** Android needs a tap to finish ([UpdateInstallReceiver] has checked the screen it names). On screen: show its prompt. Otherwise a notification, if allowed, else the Update button next time. */
     fun onNeedsConfirmation(confirm: Intent) {
         val release = store.known()?.takeIf(::isUpdate)
+        // Only the flag that starts a screen of its own: nothing else the intent carried (a permission to read a file, say) goes with it.
+        val prompt = Intent(confirm).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         when {
-            appVisible -> app.startActivity(confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            release != null && notifier.canPost() -> notifier.postReady(confirm, release)
+            appVisible -> app.startActivity(prompt)
+            release != null && notifier.canPost() -> notifier.postReady(prompt, release)
             else -> _state.value = release?.let { UpdateState.Available(it) } ?: UpdateState.Idle
         }
     }
