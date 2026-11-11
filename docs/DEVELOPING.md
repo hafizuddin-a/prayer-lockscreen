@@ -29,7 +29,7 @@ approximate alarms. It exists in case Google Play does not accept the declaratio
 `./gradlew :app:bundleRelease -PexactAlarms=false`.
 
 **Without the self-updater.** `-PselfUpdate=false` builds without the updater: the same kind of build step removes `REQUEST_INSTALL_PACKAGES` from
-the merged manifest, `BuildConfig.SELF_UPDATE` is false, and the home banner, the About screen's Updates section and the daily job are all off. Google
+the merged manifest, `BuildConfig.SELF_UPDATE` is false, and the home banner, the About screen's Updates section and the monthly job are all off. Google
 Play does not allow an app to update itself, so `tools/build-play-bundle.sh` always uses it. `tools/build-sideload.sh` does too, because a build
 signed with the debug key could never install a release signed with the other key. `tools/build-release-apk.sh` (the build people download from
 GitHub) does not.
@@ -105,7 +105,7 @@ adb shell dumpsys deviceidle force-idle                                         
 python3 -m http.server 8000 --bind 127.0.0.1 --directory srv    # srv/ holds latest.json and the APK; loopback only (the emulator reaches it as 10.0.2.2)
 adb shell am start --activity-clear-task -n com.prayerwallpaper.app/.DebugClockActivity --es updatefeed http://10.0.2.2:8000/latest.json --ez updatecheck true
 #   latest.json has the shape of GitHub's "latest release": {"tag_name":"v1.8.2","draft":false,"prerelease":false,"assets":[{"name":"prayer-wallpaper.apk","size":4078147,"browser_download_url":"http://10.0.2.2:8000/prayer-wallpaper.apk"}]}
-#   --es updatefeed "" goes back to GitHub; --ez updatenow true is what the daily job does, now; --ez updatereset true forgets what was found
+#   --es updatefeed "" goes back to GitHub; --ez updatenow true is what the monthly job does, now; --ez updatereset true forgets what was found
 #   Always launch with --activity-clear-task, or the running screen ignores the extras. A debug APK can only update to another debug-key build, and on a
 #   Play emulator Google Play Protect blocks debug builds as "Harmful app" at Android's install step: everything before that step can be tried this way.
 #   The signed release APK is not blocked (it shows "App scan recommended", then "This app looks safe": checked 11 November 2026), but its feed is

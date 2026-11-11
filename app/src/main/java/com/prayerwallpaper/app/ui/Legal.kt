@@ -73,7 +73,7 @@ object Legal {
             "Use my location, your phone's approximate location is read once, on the phone, to find the nearest " +
             "city; it is not saved and not sent anywhere. Prayer reminders are optional and off until you turn them on: " +
             "they are set and shown on your phone only, and a short log of when each one arrived stays on the phone. " +
-            "The version downloaded from GitHub also asks GitHub once a day whether a new version is out, and sends nothing about you; " +
+            "The version downloaded from GitHub also asks GitHub once a month whether a new version is out, and sends nothing about you; " +
             "you can turn that off in About. " +
             "Links in the app (the licences and the feedback link) open in your browser or Instagram only when you tap them."
 

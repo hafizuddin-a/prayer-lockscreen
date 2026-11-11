@@ -1,6 +1,12 @@
 package com.prayerwallpaper.app.ui.setup
 
 import android.widget.Toast
+import kotlinx.coroutines.launch
+import com.prayerwallpaper.app.settings.BackgroundMode
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -160,6 +166,18 @@ internal fun WelcomePage(app: PrayerApp, resumes: Int, state: SettingsState, onN
     val times = rememberLiveTimes(app, timetable, resumes)
     val screen = LocalResources.current.displayMetrics
     val current = settings.sizeChoice()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    // The same photo import as the Look screen: a new photo starts centred at 1x.
+    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val result = withContext(Dispatchers.IO) { runCatching { app.photos.import(uri) } }
+                result.onSuccess { version -> state.change { it.copy(mode = BackgroundMode.PHOTO, photoVersion = version, photoZoom = 1f, photoPanX = 0.5f, photoPanY = 0.5f) } }
+                result.onFailure { Toast.makeText(context, "Could not use that photo", Toast.LENGTH_SHORT).show() }
+            }
+        }
+    }
 
     SetupPage(
         SetupStep.WELCOME, "Prayer times on your lock screen", onBack = null,
@@ -192,6 +210,15 @@ internal fun WelcomePage(app: PrayerApp, resumes: Int, state: SettingsState, onN
         }
         TextButton(onClick = onChangePlace, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (place.usesMuis) "Not in Singapore? Change place" else "Change place") }
 
+        Text("Pick a photo for the background?", style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
+        OutlinedButton(onClick = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+            Text(if (settings.photoVersion == 0L) "Choose a photo" else "Choose a different photo")
+        }
+        Text(
+            if (settings.photoVersion == 0L) "Or keep the default. Change it later in Look." else "Done. Move and zoom it later in Look.",
+            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+
         Text("Make the text bigger?", style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             for (choice in SizeChoice.entries) {
@@ -213,7 +240,7 @@ internal fun WelcomePage(app: PrayerApp, resumes: Int, state: SettingsState, onN
         )
         if (BuildConfig.SELF_UPDATE) {
             Text(
-                "The app looks on GitHub once a day for a new version. You can turn that off in About.",
+                "The app looks on GitHub once a month for a new version. You can turn that off in About.",
                 style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

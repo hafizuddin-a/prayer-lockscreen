@@ -111,7 +111,7 @@ class DebugClockActivity : ComponentActivity() {
     /**
      * Updates from GitHub, tried without publishing anything: --es updatefeed http://10.0.2.2:8000/latest.json (the address to ask instead of GitHub,
      * a file shaped like GitHub's "latest release" answer; an empty value goes back to GitHub), --ez updatecheck true (a person's own check now),
-     * --ez updatenow true (what the daily job does, now), --ez updatereset true (forget what was found). Read the result: `adb logcat -d -s PrayerUpdate`.
+     * --ez updatenow true (what the monthly job does, now), --ez updatereset true (forget what was found). Read the result: `adb logcat -d -s PrayerUpdate`.
      */
     private fun applyUpdates(intent: Intent) {
         val app = application as PrayerApp

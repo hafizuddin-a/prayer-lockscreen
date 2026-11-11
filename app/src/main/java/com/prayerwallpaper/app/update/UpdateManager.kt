@@ -265,7 +265,7 @@ class UpdateManager(private val app: PrayerApp) {
         }
     }
 
-    // --- the screens and the daily job ---
+    // --- the screens and the monthly job ---
 
     /** The app came to the front: finish what was waiting for the install permission, and look for an update if it is time. */
     fun onAppResumed() {
@@ -275,7 +275,7 @@ class UpdateManager(private val app: PrayerApp) {
         if (app.settings.read().autoUpdate) checkAsync(force = false)
     }
 
-    /** The daily job. Not for the main thread. */
+    /** The monthly job. Not for the main thread. */
     fun runInBackground() {
         if (!BuildConfig.SELF_UPDATE) return
         val settings = app.settings.read()

@@ -20,7 +20,7 @@
 
 An Android live wallpaper that draws today's prayer times on the lock screen: two columns, six rows, the prayer that is on now marked, and a
 countdown to the next one. Singapore uses the official MUIS timetable and Hijri calendar; any other place is calculated on the phone.
-Version 1.8.1, for Android 14 and later. No account, no ads, no analytics.
+Version 1.8.2, for Android 14 and later. No account, no ads, no analytics.
 
 ## What it does
 
@@ -65,7 +65,7 @@ project's release key (certificate SHA-256 `7c0fafe65f40f82fd0e3395381672b843c81
 With USB debugging on (Settings, About phone, tap *Build number* seven times; then Settings, System, Developer options) you can also run
 `adb install -r prayer-wallpaper.apk`.
 
-**Updates.** The app asks GitHub for a newer release when you open it (at most every six hours) and about once a day in the background. When there
+**Updates.** The app asks GitHub for a newer release when you open it (at most once a month) and about once a month in the background. When there
 is one, an **Update** button shows on its first screen: tap it, switch on **Allow from this source** for Prayer Live Wallpaper if Android asks, and
 confirm Android's prompt. Android decides whether a later update can go in without a prompt. Switch the check off with **Keep the app up to date**
 under About; **Check for updates** there still works. An update is only installed if it is signed with the same key as the copy you have, which

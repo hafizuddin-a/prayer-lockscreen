@@ -47,7 +47,7 @@ Things worth knowing:
   update of a copy installed from a downloaded file asks once, and later ones can go in quietly. It needs `REQUEST_INSTALL_PACKAGES` and the
   person's own **Allow from this source** (`SystemScreens.unknownSources`). When Android wants a tap it hands back an intent: the app starts it if
   its screen is in front, otherwise posts a notification (only if notifications are already allowed), and the home banner covers the rest. The
-  app asks when it opens (`onAppResumed`, at most every six hours) and through `UpdateWorker` once a day, both only while **Keep the app up to date**
+  app asks when it opens (`onAppResumed`, at most once a month) and through `UpdateWorker` once a month, both only while **Keep the app up to date**
   is on; **Check for updates** always asks. `-PselfUpdate=false` removes all of it, and the permission, which Google Play needs. Play Protect blocked
   a debug build as "Harmful app" but showed only its usual "App scan recommended", then "This app looks safe", for the signed release build (Play
   emulator, 11 November 2026), so test the real APK, not a debug one.

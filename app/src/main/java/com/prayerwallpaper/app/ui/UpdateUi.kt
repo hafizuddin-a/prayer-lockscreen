@@ -90,7 +90,7 @@ fun UpdatesSection(app: PrayerApp, settings: SettingsState) {
         if (primary) Button(onClick = action.run) { Text(action.label) } else OutlinedButton(onClick = action.run) { Text(action.label) }
     }
     SwitchRow(
-        "Keep the app up to date", "Looks on GitHub once a day for a new version and installs it.",
+        "Keep the app up to date", "Looks on GitHub once a month for a new version and installs it.",
         settings.settings.autoUpdate,
         onChange = { on ->
             settings.change { it.copy(autoUpdate = on) }

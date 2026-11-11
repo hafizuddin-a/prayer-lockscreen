@@ -79,7 +79,7 @@ fun isTrustedApkUrl(url: String, debug: Boolean): Boolean =
     url.startsWith(UpdateSource.DOWNLOAD_PREFIX) || (debug && url.startsWith("http://10.0.2.2:"))
 
 /** How often the app asks GitHub on its own. A person's own "Check for updates" always asks. */
-val UPDATE_CHECK_INTERVAL: Duration = Duration.ofHours(6)
+val UPDATE_CHECK_INTERVAL: Duration = Duration.ofDays(30)
 
 fun shouldCheckForUpdate(nowMillis: Long, lastCheckMillis: Long, force: Boolean): Boolean =
     force || lastCheckMillis <= 0 || nowMillis - lastCheckMillis >= UPDATE_CHECK_INTERVAL.toMillis() || nowMillis < lastCheckMillis

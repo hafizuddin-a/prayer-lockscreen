@@ -60,7 +60,7 @@
 <h2>App updates (the version from GitHub)</h2>
 <p>The app you download from GitHub can look for its own new versions. This is on by default and you can turn it off. A version installed from Google Play has none of this: Google Play does the updating.</p>
 <ul>
-<li>When <strong>Keep the app up to date</strong> (under About) is on, the app asks GitHub for the newest release when you open it, at most every six hours, and about once a day in the background. When it is off, the app only asks when you tap <strong>Check for updates</strong>.</li>
+<li>When <strong>Keep the app up to date</strong> (under About) is on, the app asks GitHub for the newest release when you open it, at most once a month, and about once a month in the background. When it is off, the app only asks when you tap <strong>Check for updates</strong>.</li>
 <li>The request goes to api.github.com over an encrypted (HTTPS) connection and contains nothing about you. Like any internet request, it is seen by the server along with your network address (IP address) and the app&#x27;s name and version (for example <code>PrayerLiveWallpaper/1.8.1</code>). The app sends no identifier, account or setting of yours.</li>
 <li>If there is a newer version, the app downloads the file from GitHub and asks Android to install it. Before that, it checks that the file is this app, is newer, and is signed with the same key as the copy you have. Android checks the key again and has the last word: it may ask you to confirm.</li>
 <li>For this the app asks Android for the permission to install apps, which you switch on under <strong>Allow from this source</strong>. The app uses it only for its own updates.</li>

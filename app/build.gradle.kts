@@ -63,8 +63,8 @@ android {
         applicationId = "com.prayerwallpaper.app"
         minSdk = 34
         targetSdk = 36
-        versionCode = 10
-        versionName = "1.8.1"
+        versionCode = 11
+        versionName = "1.8.2"
         buildConfigField("boolean", "EXACT_ALARMS", exactAlarms.toString())
         buildConfigField("boolean", "SELF_UPDATE", selfUpdate.toString())
     }

@@ -86,7 +86,7 @@ data class AppSettings(
     val accessAsked: Boolean = false,
     /** Whether the first-run setup was finished. An update never shows it (see [com.prayerwallpaper.app.logic.shouldShowSetup]). */
     val setupDone: Boolean = false,
-    /** Whether the app looks for a new version on GitHub about once a day and installs it when Android allows. Only builds with self-update have it. */
+    /** Whether the app looks for a new version on GitHub about once a month and installs it when Android allows. Only builds with self-update have it. */
     val autoUpdate: Boolean = true,
     /** Notifications at prayer times. Off until the user turns them on, which starts the permission flow. */
     val remindersOn: Boolean = false,
@@ -142,8 +142,8 @@ data class AppSettings(
         const val MIN_LIST_TOP = 0.05f
         const val MAX_LIST_TOP = 0.85f
         const val DEFAULT_SOLID = 0xFF0F2A53.toInt()
-        const val DEFAULT_GRADIENT_TOP = 0xFF4F6C95.toInt()
-        const val DEFAULT_GRADIENT_BOTTOM = 0xFF011142.toInt()
+        const val DEFAULT_GRADIENT_TOP = 0xFF5B5E9E.toInt()
+        const val DEFAULT_GRADIENT_BOTTOM = 0xFF0A0E2C.toInt()
     }
 }
 

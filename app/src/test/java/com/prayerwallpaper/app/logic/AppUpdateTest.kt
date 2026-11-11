@@ -101,10 +101,10 @@ class AppUpdateTest {
 
     private val hour = 3_600_000L
 
-    @Test fun `the app asks on its own at most every few hours, a person's own check always asks`() {
+    @Test fun `the app asks on its own at most once a month, a person's own check always asks`() {
         val last = 1_000_000_000_000L
-        assertFalse(shouldCheckForUpdate(last + hour, last, force = false))
-        assertTrue(shouldCheckForUpdate(last + 6 * hour, last, force = false))
+        assertFalse(shouldCheckForUpdate(last + 29 * 24 * hour, last, force = false))
+        assertTrue(shouldCheckForUpdate(last + 30 * 24 * hour, last, force = false))
         assertTrue(shouldCheckForUpdate(last + hour, last, force = true))
     }
 
