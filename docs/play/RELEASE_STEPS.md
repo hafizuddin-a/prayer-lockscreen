@@ -156,7 +156,7 @@ Why "no data collected" is accurate:
 | Notifications | Optional reminders. The permission is asked only when reminders are turned on and used for nothing else. Alarms and notifications are set and shown on the phone | No |
 | Reminder and widget history | A small 14-day log of when each alarm was planned and arrived, in private storage. Leaves only if the user taps "Share ... as text" | Only by the user's own action |
 | Photo | The system photo picker. The app sees only the one photo chosen and keeps a smaller private copy | No |
-| Wallpaper colours | Three colour numbers if the user asks to match their wallpaper, never the image | No |
+| Wallpaper colours | Only from older versions that had "Match my wallpaper" (removed): three colour numbers, never the image | No |
 | Identifiers, contacts, files, messages, purchases, health | Not accessed | No |
 
 Google's form treats data that is only processed on the device and never transmitted as "not collected". Check this reading against the current form

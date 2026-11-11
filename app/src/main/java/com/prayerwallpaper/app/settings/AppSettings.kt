@@ -161,7 +161,9 @@ class SettingsStore(private val prefs: SharedPreferences) {
             null
         }
         return AppSettings(
-            mode = prefs.getString(MODE, null)?.let { name -> BackgroundMode.entries.firstOrNull { it.name == name } } ?: d.mode,
+            mode = prefs.getString(MODE, null)?.let { name -> BackgroundMode.entries.firstOrNull { it.name == name } }
+                // "Match my wallpaper" is no longer offered: whoever had it gets the gradient.
+                ?.takeIf { it != BackgroundMode.MATCH } ?: d.mode,
             captured = captured,
             captureSkipped = prefs.getBoolean(CAPTURE_SKIPPED, false),
             photoVersion = prefs.getLong(PHOTO_VERSION, 0),

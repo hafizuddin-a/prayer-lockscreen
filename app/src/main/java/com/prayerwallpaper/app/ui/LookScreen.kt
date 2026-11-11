@@ -164,33 +164,13 @@ fun LookScreen(app: PrayerApp, resumes: Int, onBack: () -> Unit, onAdjustPhoto: 
         }
 
         SectionCard("Background") {
-            ModeRow(BackgroundMode.MATCH, settings.mode, "Match my wallpaper", "Your wallpaper's colours.") { change { s -> s.copy(mode = it) } }
             ModeRow(BackgroundMode.PHOTO, settings.mode, "Photo", "Pick a photo. A screenshot of your old wallpaper works well.") { change { s -> s.copy(mode = it) } }
             ModeRow(BackgroundMode.SOLID, settings.mode, "Solid colour", null) { change { s -> s.copy(mode = it) } }
             ModeRow(BackgroundMode.GRADIENT, settings.mode, "Gradient", "Two colours, top to bottom.") { change { s -> s.copy(mode = it) } }
 
             when (settings.mode) {
-                BackgroundMode.MATCH -> {
-                    val c = settings.captured
-                    // Android hands out this app's own colours once it is on the lock screen, so a capture needs the usual wallpaper back first.
-                    if (wallpaper.lockIsOurs) {
-                        Text("To capture new colours, switch to your usual wallpaper first.")
-                    } else {
-                        Button(onClick = {
-                            val colors = ColorCapture(context).readLockColors()
-                            if (colors == null) {
-                                Toast.makeText(context, "Couldn't read your lock screen colours", Toast.LENGTH_LONG).show()
-                            } else {
-                                change { it.copy(captured = colors, captureSkipped = false) }
-                            }
-                        }) { Text(if (c == null) "Capture my wallpaper colours" else "Re-capture") }
-                    }
-                    if (c == null) {
-                        Text("No colours yet. Capture them while your usual wallpaper is on the lock screen.")
-                    } else {
-                        Swatches(listOfNotNull(c.primary, c.secondary, c.tertiary))
-                    }
-                }
+                // Kept for old saved settings, which load as Gradient: nothing to show.
+                BackgroundMode.MATCH -> Unit
                 BackgroundMode.PHOTO -> {
                     OutlinedButton(onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
                         Text(if (settings.photoVersion == 0L) "Choose a photo" else "Choose a different photo")

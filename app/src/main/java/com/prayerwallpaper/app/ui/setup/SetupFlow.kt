@@ -1,20 +1,15 @@
 package com.prayerwallpaper.app.ui.setup
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.prayerwallpaper.app.BuildConfig
 import com.prayerwallpaper.app.PrayerApp
 import com.prayerwallpaper.app.logic.SetupStep
 import com.prayerwallpaper.app.logic.applyState
-import com.prayerwallpaper.app.settings.BackgroundMode
-import com.prayerwallpaper.app.settings.ColorCapture
 import com.prayerwallpaper.app.ui.chooseHomeWallpaper
 import com.prayerwallpaper.app.ui.openLiveWallpaperPicker
 import com.prayerwallpaper.app.ui.rememberSettings
@@ -37,10 +32,6 @@ fun SetupFlow(
     val settings = state.settings
     val wallpaper = rememberWallpaperStatus(resumes)
     val apply = applyState(wallpaper.lockIsOurs, wallpaper.homeIsOurs, openedPicker)
-    // Whether to copy the colours of the current lock screen into the background. Off unless asked for, and only possible before this
-    // app is on the lock screen, because after that Android hands out this app's colours instead.
-    var matchColours by rememberSaveable { mutableStateOf(false) }
-
     /** Leaving before the end: the larger text question has been seen, but the setup is not done, so the home screen offers it again. */
     fun leaveEarly() {
         state.change { it.copy(accessAsked = true) }
@@ -58,14 +49,6 @@ fun SetupFlow(
     }
 
     fun openPicker() {
-        if (matchColours && !wallpaper.lockIsOurs) {
-            val colors = ColorCapture(context).readLockColors()
-            if (colors == null) {
-                Toast.makeText(context, "Couldn't read your lock screen colours", Toast.LENGTH_LONG).show()
-            } else {
-                state.change { it.copy(captured = colors, captureSkipped = false, mode = BackgroundMode.MATCH) }
-            }
-        }
         onOpenedPicker(true)
         openLiveWallpaperPicker(context)
     }
@@ -80,7 +63,7 @@ fun SetupFlow(
             app, resumes, state, onNext = { onStep(SetupStep.APPLY) }, onSkip = ::leaveEarly, onChangePlace = onChangePlace,
         )
         SetupStep.APPLY -> ApplyPage(
-            apply = apply, matchColours = matchColours, onMatchColours = { matchColours = it },
+            app = app, state = state, apply = apply,
             onOpenPicker = ::openPicker, onChooseHome = { chooseHomeWallpaper(context) },
             onNext = { onStep(SetupStep.NOTIFICATIONS) }, onBack = ::back,
         )

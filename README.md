@@ -20,7 +20,7 @@
 
 An Android live wallpaper that draws today's prayer times on the lock screen: two columns, six rows, the prayer that is on now marked, and a
 countdown to the next one. Singapore uses the official MUIS timetable and Hijri calendar; any other place is calculated on the phone.
-Version 1.8.2, for Android 14 and later. No account, no ads, no analytics.
+Version 1.8.3, for Android 14 and later. No account, no ads, no analytics.
 
 ## What it does
 
@@ -81,8 +81,7 @@ maker's aggressive battery rules. Set Settings, Apps, Prayer Live Wallpaper, Bat
 The **Battery** row of Reminder health reads these rules.
 
 **Using your existing wallpaper.** Android does not let an ordinary app read the current wallpaper image, and applying a live wallpaper replaces the
-old one. Choose the same photo in **Photo** mode and line it up with **Adjust position and zoom**, or use *Match my wallpaper* (three colours, read
-before this app is on the lock screen).
+old one. Choose the same photo in setup or in **Photo** mode under Look and line it up with **Adjust position and zoom**.
 
 ## Documentation
 

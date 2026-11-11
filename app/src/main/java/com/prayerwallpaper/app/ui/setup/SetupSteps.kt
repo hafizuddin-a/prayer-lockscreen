@@ -166,18 +166,6 @@ internal fun WelcomePage(app: PrayerApp, resumes: Int, state: SettingsState, onN
     val times = rememberLiveTimes(app, timetable, resumes)
     val screen = LocalResources.current.displayMetrics
     val current = settings.sizeChoice()
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    // The same photo import as the Look screen: a new photo starts centred at 1x.
-    val photoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        if (uri != null) {
-            scope.launch {
-                val result = withContext(Dispatchers.IO) { runCatching { app.photos.import(uri) } }
-                result.onSuccess { version -> state.change { it.copy(mode = BackgroundMode.PHOTO, photoVersion = version, photoZoom = 1f, photoPanX = 0.5f, photoPanY = 0.5f) } }
-                result.onFailure { Toast.makeText(context, "Could not use that photo", Toast.LENGTH_SHORT).show() }
-            }
-        }
-    }
 
     SetupPage(
         SetupStep.WELCOME, "Prayer times on your lock screen", onBack = null,
@@ -209,15 +197,6 @@ internal fun WelcomePage(app: PrayerApp, resumes: Int, state: SettingsState, onN
             )
         }
         TextButton(onClick = onChangePlace, modifier = Modifier.heightIn(min = 48.dp)) { Text(if (place.usesMuis) "Not in Singapore? Change place" else "Change place") }
-
-        Text("Pick a photo for the background?", style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
-        OutlinedButton(onClick = { photoPicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
-            Text(if (settings.photoVersion == 0L) "Choose a photo" else "Choose a different photo")
-        }
-        Text(
-            if (settings.photoVersion == 0L) "Or keep the default. Change it later in Look." else "Done. Move and zoom it later in Look.",
-            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
 
         Text("Make the text bigger?", style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -294,9 +273,34 @@ private fun PickerSchematic() {
     }
 }
 
+/** "Pick a photo for the background": the same import as the Look screen, so a new photo starts centred at 1x. */
+@Composable
+private fun PhotoChoice(app: PrayerApp, state: SettingsState) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            scope.launch {
+                val result = withContext(Dispatchers.IO) { runCatching { app.photos.import(uri) } }
+                result.onSuccess { version -> state.change { it.copy(mode = BackgroundMode.PHOTO, photoVersion = version, photoZoom = 1f, photoPanX = 0.5f, photoPanY = 0.5f) } }
+                result.onFailure { Toast.makeText(context, "Could not use that photo", Toast.LENGTH_SHORT).show() }
+            }
+        }
+    }
+    val chosen = state.settings.photoVersion != 0L
+    Text("Pick a photo for the background?", style = MaterialTheme.typography.titleSmall, modifier = Modifier.semantics { heading() })
+    OutlinedButton(onClick = { picker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }) {
+        Text(if (chosen) "Choose a different photo" else "Choose a photo")
+    }
+    Text(
+        if (chosen) "Done. Move and zoom it later in Look." else "Or keep the default. Change it later in Look.",
+        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+}
+
 @Composable
 internal fun ApplyPage(
-    apply: ApplyState, matchColours: Boolean, onMatchColours: (Boolean) -> Unit, onOpenPicker: () -> Unit, onChooseHome: () -> Unit,
+    app: PrayerApp, state: SettingsState, apply: ApplyState, onOpenPicker: () -> Unit, onChooseHome: () -> Unit,
     onNext: () -> Unit, onBack: () -> Unit,
 ) {
     val done = apply == ApplyState.DONE || apply == ApplyState.HOME_ALSO
@@ -341,11 +345,7 @@ internal fun ApplyPage(
             NumberedStep(2, boldWords("Tap Set wallpaper, then choose ", "Lock screen", "."))
             NumberedStep(3, AnnotatedString("Come back here."))
             PickerSchematic()
-            SwitchRow(
-                "Match my current lock screen's colours",
-                "Use your wallpaper's colours as the background.",
-                matchColours, onMatchColours,
-            )
+            PhotoChoice(app, state)
         }
     }
 }
