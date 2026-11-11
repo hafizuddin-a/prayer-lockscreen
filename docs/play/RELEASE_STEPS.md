@@ -33,8 +33,8 @@ What a person sees, checked on the emulator on 11 November 2026 (1.8.0, installe
 shows **Update available**, **Update** leads to **Allow updates** (Android's **Install unknown apps** page, switched on once), the app downloads
 from GitHub, checks the file, and Android asks **Update this app?**. A file Google has not seen yet can also bring up Play Protect's **App scan
 recommended** (it did not for 1.8.1, which had been scanned once already: see step 3). Afterwards `dumpsys package` showed the app itself as the
-installer (`installerPackageName=com.prayerwallpaper.app`), which is what lets Android skip its prompt for later updates. That quiet case has not
-been seen yet: the first release after 1.8.1 is its test.
+installer (`installerPackageName=com.prayerwallpaper.app`), which is what lets Android skip its prompt for later updates. That quiet case was then seen on 1.8.2 to 1.8.3
+(12 November 2026): no Android prompt, though Play Protect's **App scan recommended** still appeared for the new file.
 
 The page and the privacy policy are in `site/`: edit, push to `main`, and `.github/workflows/pages.yml` publishes them in about a minute.
 `site/assets/download-qr.svg` is a QR code for the download page's address (made with `swift tools/make-qr.swift`; scan the result with a phone

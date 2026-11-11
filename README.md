@@ -1,124 +1,68 @@
 <p align="center">
-  <img src="site/assets/logo.png" alt="Prayer Live Wallpaper logo" width="200">
+  <img src="site/assets/logo.png" alt="Prayer Live Wallpaper logo" width="140">
 </p>
 
 <h1 align="center">Prayer Live Wallpaper</h1>
 
 <p align="center">
-  Prayer times on your Android lock screen. A live wallpaper that updates itself.
+  Prayer times on your Android lock screen. Free, no ads, no account.
 </p>
 
 <p align="center">
   <a href="https://hafizuddin-a.github.io/prayer-lockscreen/download/"><b>Download</b></a> ·
-  <a href="#install-on-your-phone"><b>Install</b></a> ·
   <a href="docs/DEVELOPING.md"><b>Build it</b></a> ·
-  <a href="https://hafizuddin-a.github.io/prayer-lockscreen/"><b>Privacy policy</b></a> ·
+  <a href="https://hafizuddin-a.github.io/prayer-lockscreen/"><b>Privacy</b></a> ·
   <a href="LICENSE"><b>MIT License</b></a>
 </p>
 
-<br>
+<p align="center">
+  <img src="docs/play/graphics/feature-graphic-1024x500.png" alt="The prayer times list on an Android lock screen" width="720">
+</p>
 
-An Android live wallpaper that draws today's prayer times on the lock screen: two columns, six rows, the prayer that is on now marked, and a
-countdown to the next one. Singapore uses the official MUIS timetable and Hijri calendar; any other place is calculated on the phone.
-Version 1.8.3, for Android 14 and later. No account, no ads, no analytics.
+<table>
+  <tr>
+    <td><img src="docs/play/graphics/poster-1-lock-screen.png" alt="Lock screen with the six prayer times and a countdown"></td>
+    <td><img src="docs/play/graphics/poster-2-accurate-to-muis.png" alt="Official MUIS times for Singapore"></td>
+    <td><img src="docs/play/graphics/poster-3-reminders.png" alt="Optional prayer reminders"></td>
+    <td><img src="docs/play/graphics/poster-6-movable-list.png" alt="Move the list where you want it"></td>
+  </tr>
+</table>
+
+## Get it
+
+Open the **[download page](https://hafizuddin-a.github.io/prayer-lockscreen/download/)** on your phone, or scan this:
+
+<img src="site/assets/download-qr.svg" alt="QR code for the download page" width="130">
+
+Needs Android 14 or newer. The page walks through the few steps Android asks for. The app checks GitHub once a month for a new version and shows an **Update** button when there is one (switch it off under About).
 
 ## What it does
 
-- **Lock screen.** The six times (`6:16 am`, or 24-hour), the prayer that is on now marked, and an optional line such as `Asar in 2h 14m`.
-  Syuruk is sunrise, not a prayer, so it is marked for one minute only. The list updates itself and is drawn only while the screen is on.
-  Friday shows Jumaat (Malay) or Jumuah (English) in place of Zohor or Dhuhr.
-- **Places.** Singapore uses the official timetable (downloaded daily while it is selected). Any of about 34,000 other cities, found by search or by
-  "Use my location" (approximate, once), is calculated on the phone with Adhan, using the usual method for the country, which you can change.
-  Prayer names can be Malay or English and Arabic.
-- **Hijri date** (Singapore only). A line above the list such as `23 Rabiulakhir 1448H`, with a moon icon, from a bundled table of MUIS month
-  starts: it is never calculated, and where the table does not give a certain answer no line is drawn. It changes at Maghrib (or at midnight, by a
-  setting) and names Islamic days such as Hari Raya.
-- **Reminders** (optional, off until you turn them on). A notification at each prayer you choose, with an optional heads-up, a vibrate-only mode,
-  and a **Reminder health** screen that says what could stop them and how to fix it. Exact timing needs your permission in Android settings.
-- **Home screen widgets.** Next prayer, today's times, or all six in a row, in light or dark glass or a solid card.
-- **Easier reading.** Large and Extra large text, a high contrast card, bold text, or follow the phone's own settings. The screen also lists
-  today's times as plain text for a screen reader.
-- **Look.** A gradient, a solid colour, a photo you can position and zoom, or your wallpaper's colours as the background; text colour; dim;
-  the list position, which you move in the app with a phone-shaped preview (the lock screen itself cannot be dragged).
-- **Guided setup.** A fresh install walks you through putting the wallpaper on the lock screen (and checks that it worked), keeping
-  notifications from covering the list, reminders, exact alarms and widgets. **Run setup again** is at the bottom of the home screen.
+- **Lock screen list.** Six times, the current prayer marked, and a countdown to the next.
+- **Singapore or anywhere.** Singapore uses the official MUIS timetable and Hijri dates. About 34,000 other cities are calculated on the phone.
+- **Reminders and widgets.** Optional notifications at each prayer, and three home screen widgets.
+- **Easier reading.** Larger text, high contrast, bold, and screen reader support.
+- **Your look.** A gradient, a colour or your own photo, and you place the list where you like.
+- **Private.** Nothing is collected. Times for other places never touch the network.
 
-Everything works offline once the Singapore timetable has been downloaded; other places never use the network for prayer times. (The build from
-GitHub also asks GitHub about new versions: see Updates below.)
-
-## Install on your phone
-
-Open the **[download page](https://hafizuddin-a.github.io/prayer-lockscreen/download/)** on the phone (or scan the code below). Its button always
-gives the newest APK: `https://github.com/hafizuddin-a/prayer-lockscreen/releases/latest/download/prayer-wallpaper.apk`. The APK is signed with the
-project's release key (certificate SHA-256 `7c0fafe65f40f82fd0e3395381672b843c81b2d42f87268b4c263bb771ac7da7`; check it with
-`apksigner verify --print-certs`, and each release lists the file's own SHA-256).
-
-<img src="site/assets/download-qr.svg" alt="QR code for the download page" width="150">
-
-1. Tap **Download the app**. If the browser says the file can harm your device, tap **Download anyway**: it says that about any app that is not from
-   Google Play.
-2. Open the file. If Android says it cannot install apps from this source, tap **Settings**, switch on **Allow from this source**, and go back.
-3. If Google Play Protect says **App scan recommended**, tap **Scan app**, then **Install**.
-4. Open **Prayer Live Wallpaper** and follow the setup. On Android's wallpaper screen choose **Lock screen**, so your home screen keeps its own
-   wallpaper.
-
-With USB debugging on (Settings, About phone, tap *Build number* seven times; then Settings, System, Developer options) you can also run
-`adb install -r prayer-wallpaper.apk`.
-
-**Updates.** The app asks GitHub for a newer release when you open it (at most once a month) and about once a month in the background. When there
-is one, an **Update** button shows on its first screen: tap it, switch on **Allow from this source** for Prayer Live Wallpaper if Android asks, and
-confirm Android's prompt. Android decides whether a later update can go in without a prompt. Switch the check off with **Keep the app up to date**
-under About; **Check for updates** there still works. An update is only installed if it is signed with the same key as the copy you have, which
-the app checks first and Android checks again. This is only in the build from GitHub: the Google Play build has no updater.
-
-Building it yourself with `tools/build-sideload.sh` gives an APK signed with the Android debug key instead, without the updater, because it could
-never install a release signed with another key. A phone can only update an app with a copy signed by the same key, so switching between your own
-build, the release APK and a Google Play install means uninstalling first (which also resets the app's settings and the wallpaper).
-
-**Keeping it working.** The wallpaper does nothing in the background; only the daily timetable refresh and reminders can be delayed by a phone
-maker's aggressive battery rules. Set Settings, Apps, Prayer Live Wallpaper, Battery to **Unrestricted** (the wording varies), turn on an *Autostart* or
-*Background activity* switch if your phone has one, and **never press Force stop**: Android resets a live wallpaper when its app is force-stopped.
-The **Battery** row of Reminder health reads these rules.
-
-**Using your existing wallpaper.** Android does not let an ordinary app read the current wallpaper image, and applying a live wallpaper replaces the
-old one. Choose the same photo in setup or in **Photo** mode under Look and line it up with **Adjust position and zoom**.
-
-## Documentation
+## For developers
 
 | | |
 |---|---|
-| [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) | Where each part of the code lives, and the reasons behind the less obvious choices |
-| [docs/DEVELOPING.md](docs/DEVELOPING.md) | Build, sign, release, debug tools, and the yearly upkeep (Hijri table, timetable, city list) |
-| [docs/play/RELEASE_STEPS.md](docs/play/RELEASE_STEPS.md) | Releasing on GitHub, registering the app with Google (Android developer verification), and publishing on Google Play: steps, answers for the forms, the exact alarm declaration |
-| [docs/play/listing.md](docs/play/listing.md) | The store listing text; the graphics are in `docs/play/graphics/` |
-| `site/` | The privacy policy (https://hafizuddin-a.github.io/prayer-lockscreen/) and the download page (`download/`), published by `.github/workflows/pages.yml` |
+| [docs/DEVELOPING.md](docs/DEVELOPING.md) | Build, sign, release, debug tools, yearly upkeep |
+| [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) | Where each part of the code lives and why |
+| [docs/play/RELEASE_STEPS.md](docs/play/RELEASE_STEPS.md) | GitHub releases, Google's developer verification, Google Play |
 
-## Known limits
+`tools/build-sideload.sh` builds an APK you can install yourself (signed with the debug key, so it can't update to the release APK without uninstalling first).
 
-- So far everything was checked on an Android 16 emulator and by unit tests. Not yet tested end to end on a real phone: a phone maker's launcher,
-  battery rules, lock screen layout and fonts, and real TalkBack. The updater was run end to end on the emulator (1.8.0 updating to the published
-  1.8.1 from GitHub); an update that Android installs with no prompt at all has not been seen yet.
-- The widgets' alarms are inexact, so a widget can redraw up to about ten minutes after a prayer time (the countdown itself never lags), and the
-  one-minute Syuruk mark may show late or not at all on a widget. The lock screen redraws on the minute.
-- Singapore data stops at the end of the cached year until the next timetable is published and fetched (late November). The Hijri table runs out
-  after 27 January 2028; the line is then hidden until an update adds MUIS's next calendar.
-- Calculated times can differ from a local mosque by a few minutes. Cities under about 15,000 people are not in the list: pick the nearest
-  bigger one. Adhan 1.2.1 has no preset for Tehran's method, so Iran starts on the Muslim World League.
-- The countdown's "in", "h" and "m" are English even with Malay prayer names.
-- The list does not follow the phone as it travels: change the place yourself. Only portrait was checked.
+**Known limits.** Checked on an Android 16 emulator and in unit tests; one real phone so far. Widgets can redraw up to about ten minutes late. The Hijri table runs to 27 January 2028. Calculated times can differ from a local mosque by a few minutes.
 
 ## Licence and credits
 
-The code, documentation and graphics are under the [MIT License](LICENSE). Not everything the app uses is the author's to licence, and these keep
-their own terms:
+Code, docs and graphics are under the [MIT License](LICENSE). Three things keep their own terms:
 
-- **MUIS data.** The Hijri month starts and Islamic events (`data/*.csv` and the generated `app/src/main/assets/hijri_months.json` and
-  `islamic_events.json`) follow the Muis Calendar published by MUIS and are used here with MUIS's agreement. They are MUIS's data, not covered by
-  the MIT License. The Singapore prayer timetable is not in this repository: the app downloads it from data.gov.sg (Majlis Ugama Islam Singapura),
-  under the Singapore Open Data Licence.
-- **City list.** `app/src/main/assets/cities.tsv` is derived from GeoNames (geonames.org), CC BY 4.0.
-- **Libraries.** AndroidX, Jetpack Compose, WorkManager, Kotlin and kotlinx.serialization are Apache License 2.0; Adhan (prayer time calculation)
-  is MIT.
+- **MUIS data.** The Hijri month starts and Islamic events follow the Muis Calendar and are used with MUIS's agreement. They are MUIS's data, not MIT. The Singapore timetable is downloaded from data.gov.sg under the Singapore Open Data Licence.
+- **Cities.** `cities.tsv` comes from GeoNames (CC BY 4.0).
+- **Libraries.** AndroidX, Compose, WorkManager, Kotlin (Apache 2.0) and Adhan (MIT).
 
-Not affiliated with or endorsed by MUIS. Calculated times are not an official timetable. The About screen carries all the credits and licence
-texts.
+Not affiliated with or endorsed by MUIS. Calculated times are not an official timetable.
